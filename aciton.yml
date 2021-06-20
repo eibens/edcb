@@ -1,0 +1,7 @@
+name: edcb
+description: Lint, check formatting, and test Deno modules.
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: bash ./edcb.sh
