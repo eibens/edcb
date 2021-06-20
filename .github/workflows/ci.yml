@@ -7,4 +7,4 @@ jobs:
       - uses: actions/checkout@v2
       - uses: denoland/setup-deno@v1
       - shell: bash
-        run: bash <(curl -s https://deno.land/x/edcb/build.sh)
+        run: bash <(curl -s https://deno.land/x/edcb/edcb.sh)
