@@ -6,4 +6,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: denoland/setup-deno@v1
+      # NOTE: Replace 'master' with a particular version when using edcb.
+      # Here, 'master' to always test the most recent version.
       - uses: eibens/edcb@master
