@@ -9,4 +9,4 @@ runs:
   using: composite
   steps:
     - shell: bash
-      run: bash <$(curl -sL "https://deno.land/x/edcb@${{ github.event.inputs.version }}/edcb.sh)
+      run: bash <$(curl -sL https://deno.land/x/edcb@${{ github.event.inputs.version }}/edcb.sh)
