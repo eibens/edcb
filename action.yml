@@ -1,7 +1,12 @@
 name: edcb
 description: Lint, check formatting, and test Deno modules.
+inputs:
+  version:
+    description: 'Version of edcb.'
+    required: false
+    default: 'master'
 runs:
   using: composite
   steps:
     - shell: bash
-      run: bash ./edcb.sh
+      run: bash <$(curl -sL "https://deno.land/x/edcb@${{ version }}/edcb.sh)

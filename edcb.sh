@@ -18,6 +18,8 @@ jobs:
       - uses: denoland/setup-deno@v1
       # NOTE: 'master' should be replaced with a specific version.
       - uses: eibens/edcb@master
+        with:
+          version: master
 END_HEREDOC
 )
 
