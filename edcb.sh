@@ -23,7 +23,7 @@ jobs:
 END_HEREDOC
 )
 
-# Initialization with 'init' command.
+# 'init' command
 if [ "$1" = "init" ]; then
   # Prevent overwriting existing files.
   set -o noclobber
@@ -31,7 +31,20 @@ if [ "$1" = "init" ]; then
   # Create GitHub Actions workflow file.
   mkdir -p $(dirname "$CI_FILE")
   echo "$CI_YAML" > "$CI_FILE"
+  echo "Wrote file: ${CI_FILE}"
 
+  # Do not continue after init.
+  exit 0
+fi
+
+# 'upgrade' command
+if [ "$1" = "upgrade" ]; then
+
+  # Install latest version.
+  curl -sL https://deno.land/x/edcb/edcb.sh > ~/bin/edcb
+  chmod +x ~/bin/edcb
+  echo "Upgrade complete."
+  
   # Do not continue after init.
   exit 0
 fi

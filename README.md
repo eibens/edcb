@@ -32,6 +32,13 @@ The [edcb] version can be specified in the URL:
 curl -sL https://deno.land/x/edcb@{ref}/edcb.sh > ~/bin/edcb && chmod +x ~/bin/edcb
 ```
 
+Once installed, the `upgrade` command can be used to install the latest version:
+
+```sh
+# Let edcb upgrade itself.
+edcb upgrade
+```
+
 Building a project is now as simple as running this in the project root:
 
 ```sh
