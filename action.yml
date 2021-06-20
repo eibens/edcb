@@ -12,4 +12,4 @@ runs:
       run: | 
         URL="https://raw.githubusercontent.com/eibens/edcb/${{ inputs.version }}/edcb.sh"
         BASH=$(curl -sL "$URL")
-        bash < "$bash"
+        echo "$BASH" | bash
