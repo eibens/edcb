@@ -1,6 +1,6 @@
 # [edcb]
 
-> [edcb] (for _Eibens-Deno Continuous Build_) is an opinionated process for
+> [edcb] (for _Eibens-Deno Continuous Build_) is an opinionated workflow for
 > building a [Deno] project locally and in a CI environment. It is implemented
 > as a bash script and can be used in a local shell and [GitHub Actions].
 
@@ -12,7 +12,7 @@
 # Motivation
 
 In order to make a [Deno] project production ready, the code should be
-formatted, linted, and tested. This process is usually very similar across
+formatted, linted, and tested. This workflow is usually very similar across
 projects. [edcb] is an attempt of generalizing these tasks across projects and
 across local systems and CI environments.
 
