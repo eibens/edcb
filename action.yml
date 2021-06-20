@@ -9,4 +9,6 @@ runs:
   using: composite
   steps:
     - shell: bash
-      run: bash <$(curl -sL "https://raw.githubusercontent.com/eibens/edcb/${{ inputs.version }}/edcb.sh")
+      run: | 
+        URL="https://raw.githubusercontent.com/eibens/edcb/${{ inputs.version }}/edcb.sh"
+        bash <$(curl -sL "$URL")
