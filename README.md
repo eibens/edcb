@@ -24,7 +24,7 @@ for testing.
 
 # Usage
 
-The latest version of the [edcb.sh] file can be installed in a shell:
+The latest version of [edcb] can be installed in a shell:
 
 ```sh
 # Downloads edcb.sh and makes it executable.
