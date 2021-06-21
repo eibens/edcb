@@ -49,9 +49,15 @@ if [ "$1" = "upgrade" ]; then
   exit 0
 fi
 
-# Lint and check formatting.
+# Format files (just check in CI).
+if [ "$CI" == true ]; then
+  deno fmt --check
+else
+  deno fmt
+fi
+
+# Run linter after formatting, since it is more high-level.
 deno lint
-deno fmt --check
 
 # Run tests and generate coverage profile.
 deno test -A --unstable --coverage="$COV_DIR"
@@ -59,7 +65,7 @@ deno test -A --unstable --coverage="$COV_DIR"
 # Print coverage info to stdout.
 deno coverage --unstable "$COV_DIR"
 
-# Only run this from GitHub Actions.
+# Upload coverage in CI.
 if [ "$CI" = true ]; then
 
   # Generate coverage file.

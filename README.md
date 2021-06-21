@@ -39,19 +39,23 @@ Once installed, the `upgrade` command can be used to install the latest version:
 edcb upgrade
 ```
 
-Building a project is now as simple as running this in the project root:
+Building a project is now as simple as running [edcb] in the project root:
 
 ```sh
-# Lints, checks formatting, and tests in the current directory.
+# Formats, lints, and runs tests in the current directory.
 edcb
 ```
 
-If the `CI` environment variable is `true` (which is automatically set by
-GitHub), code coverage will be uploaded to [codecov]:
+Setting the `CI` environment variable to `true` (which is done automatically by
+[GitHub Actions]) changes the behavior as follows:
+
+1. Runs the [Deno] formatter with the `--check` flag.
+2. Generates a test coverage file.
+3. Uploads the test coverage file to [codecov.io]. This step likely fails on
+   local systems, which is the intended behavior.
 
 ```sh
 export CI=true
-# Will attempt to upload code coverage data to codecov.io
 edcb
 ```
 
@@ -67,7 +71,7 @@ edcb init
 [edcb]: #
 [Deno]: https://deno.land
 [GitHub Actions]: https://github.com/features/actions
-[codecov]: https://codecov.io
+[codecov.io]: https://codecov.io
 [edcb.sh]: edcb.sh
 
 <!-- badges -->
