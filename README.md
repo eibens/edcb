@@ -2,7 +2,7 @@
 
 > [edcb] (for _Eibens-Deno Continuous Build_) is an opinionated workflow for
 > building a [Deno] project locally and in a CI environment. It is implemented
-> as a bash script and can be used in a local shell and [GitHub Actions].
+> as a bash script and can be used in a local shell and with [GitHub Actions].
 
 [![License][license-shield]](LICENSE) [![Deno doc][deno-doc-shield]][deno-doc]
 [![Deno module][deno-land-shield]][deno-land]
@@ -22,7 +22,7 @@ The [edcb] project is itself built with [edcb]. Currently, no actual TypeScript
 API is exported by this project. The [answer.ts] module serves as a placeholder
 for testing.
 
-# Documentation
+# Usage
 
 The latest version of the [edcb.sh] file can be installed in a shell:
 
