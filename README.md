@@ -16,6 +16,12 @@ formatted, linted, and tested. This workflow is usually very similar across
 projects. [edcb] is an attempt of generalizing these tasks across projects and
 across local systems and CI environments.
 
+# Example
+
+The [edcb] project is itself built with [edcb]. Currently, no actual TypeScript
+API is exported by this project. The [answer.ts] module serves as a placeholder
+for testing.
+
 # Documentation
 
 The latest version of the [edcb.sh] file can be installed in a shell:
@@ -73,6 +79,7 @@ edcb init
 [GitHub Actions]: https://github.com/features/actions
 [codecov.io]: https://codecov.io
 [edcb.sh]: edcb.sh
+[answer.ts]: answer.ts
 
 <!-- badges -->
 
@@ -83,7 +90,7 @@ edcb init
 [coverage]: https://codecov.io/gh/eibens/edcb
 [build]: https://github.com/eibens/edcb/actions/workflows/ci.yml
 [build-shield]: https://img.shields.io/github/workflow/status/eibens/edcb/ci?logo=github&label
-[deno-doc]: https://doc.deno.land/https/deno.land/x/edcb/mod.ts
+[deno-doc]: https://doc.deno.land/https/deno.land/x/edcb/example.ts
 [deno-doc-shield]: https://img.shields.io/badge/doc-informational?logo=deno
 [deno-land]: https://deno.land/x/edcb
 [deno-land-shield]: https://img.shields.io/badge/x/edcb-informational?logo=deno&label
