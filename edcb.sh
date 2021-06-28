@@ -7,6 +7,7 @@ set -e
 COV_DIR=$(mktemp -d)
 COV_FILE=$(mktemp)
 CI_FILE=.github/workflows/ci.yml
+IGNORE="./docs"
 CI_YAML=$(cat <<'END_HEREDOC'
 name: ci
 on: [push, pull_request]
@@ -57,7 +58,7 @@ else
 fi
 
 # Run linter after formatting, since it is more high-level.
-deno lint
+deno lint --ignore="$IGNORE"
 
 # Run tests and generate coverage profile.
 deno test -A --unstable --coverage="$COV_DIR"
