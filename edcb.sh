@@ -50,11 +50,11 @@ if [ "$1" = "upgrade" ]; then
   exit 0
 fi
 
-# Format files (just check in CI).
+# Format source files (just check in CI).
 if [ "$CI" == true ]; then
-  deno fmt --check
+  deno fmt --check --ignore="$IGNORE"
 else
-  deno fmt
+  deno fmt --ignore="$IGNORE"
 fi
 
 # Run linter after formatting, since it is more high-level.
