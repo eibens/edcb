@@ -22,9 +22,24 @@ The [edcb] project is itself built with [edcb]. Currently, no actual TypeScript
 API is exported by this project. The [answer.ts] module serves as a placeholder
 for testing.
 
-# Usage
+# Install Deno CLI
 
-The latest version of [edcb] can be installed in a shell:
+The [edcb] CLI can be installed with [Deno]:
+
+```sh
+deno install -f -A https://deno.land/x/edcb/cli.ts
+```
+
+The [edcb] version can be specified in the URL:
+
+```sh
+# Replace {ref} with the desired Git tag or branch.
+deno install -f -A https://deno.land/x/edcb@{ref}/cli.ts
+```
+
+## Install Bash Script
+
+The [edcb] bash script [edcb.sh] can be installed directly:
 
 ```sh
 # Downloads edcb.sh and makes it executable.
@@ -38,14 +53,18 @@ The [edcb] version can be specified in the URL:
 curl -sL https://deno.land/x/edcb@{ref}/edcb.sh > ~/bin/edcb && chmod +x ~/bin/edcb
 ```
 
-Once installed, the `upgrade` command can be used to install the latest version:
+Once installed with the method above, the `upgrade` command can be used to
+install the latest version of the script:
 
 ```sh
 # Let edcb upgrade itself.
 edcb upgrade
 ```
 
-Building a project is now as simple as running [edcb] in the project root:
+# Usage
+
+After installation, building a project is as simple as running [edcb] in the
+project root:
 
 ```sh
 # Formats, lints, and runs tests in the current directory.
