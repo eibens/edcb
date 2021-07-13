@@ -1,9 +1,12 @@
 import {
+  blue,
   cyan,
   gray,
   green,
+  magenta,
   red,
 } from "https://deno.land/std@0.101.0/fmt/colors.ts";
+import { dirname, join } from "https://deno.land/std@0.101.0/path/mod.ts";
 
 if (import.meta.main) {
   if (Deno.args[0] === "upgrade") {
@@ -14,35 +17,11 @@ if (import.meta.main) {
     Deno.exit(1);
   }
 
-  // NOTE: Infer version of `edcb.sh` from module URL.
-  const thisUrl = import.meta.url;
-  if (!thisUrl.match(/\/cli\.ts$/)) {
-    console.error(red("[edcb] was loaded from unknown source"));
-    Deno.exit(1);
-  }
-  const rootUrl = thisUrl.substr(0, thisUrl.length - "cli.ts".length);
-  const scriptUrl = rootUrl + "edcb.sh";
+  const file = await install();
 
-  // NOTE: Since we build the bash script URL from the module URL,
-  // it can either be 'file' or 'http' / 'https' protocols.
-  // For example, when running `deno run -A cli.ts` in this project,
-  // the `edcb.sh` file will be used directly as a file. If someone
-  // runs `deno run -A http://deno.land/x/edcb@1.2.3/cli.ts`,
-  // `https://deno.land/x/edcb@1.2.3/edcb.ts` will be downloaded.
-  const { protocol, pathname } = new URL(scriptUrl);
-  let file = pathname;
+  console.log(blue("[edcb] file: " + file));
+  console.log(cyan("[edcb] running"));
 
-  // File must be downloaded from URL.
-  if (protocol !== "file:") {
-    console.log(cyan("[edcb] downloading"));
-    const script = await (await fetch(scriptUrl)).text();
-
-    console.log(cyan("[edcb] installing"));
-    file = (await Deno.makeTempFile()) + ".edcb.sh";
-    await Deno.writeTextFile(file, script);
-  }
-
-  console.log(cyan("[edcb] running: " + file));
   const process = Deno.run({
     cmd: ["bash", file, ...Deno.args],
   });
@@ -56,5 +35,35 @@ if (import.meta.main) {
   } else {
     console.error(red("[edcb] failed"));
     Deno.exit(1);
+  }
+}
+
+async function install(): Promise<string> {
+  // Locate edcb.sh script file.
+  const url = new URL(import.meta.url);
+  url.pathname = join(dirname(url.pathname), "edcb.sh");
+
+  // Log version.
+  const match = url.pathname.match(/v[0-9]+\.[0-9]+\.[0-9]+/);
+  const version = match ? match[0] : "unknown";
+  console.log(magenta("[edcb] version: " + version));
+
+  switch (url.protocol) {
+    case "file:": {
+      return url.pathname;
+    }
+    case "http:":
+    case "https:": {
+      console.log(blue("[edcb] url:" + url));
+      console.log(cyan("[edcb] downloading"));
+      const script = await (await fetch(url)).text();
+
+      console.log(cyan("[edcb] installing"));
+      const tmpFile = (await Deno.makeTempFile()) + ".edcb.sh";
+      await Deno.writeTextFile(tmpFile, script);
+      return tmpFile;
+    }
+    default:
+      throw new Error("[edcb] unknown source protocol");
   }
 }
