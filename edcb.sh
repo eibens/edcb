@@ -17,10 +17,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: denoland/setup-deno@v1
-      # NOTE: 'master' should be replaced with a specific version.
-      - uses: eibens/edcb@master
-        with:
-          version: master
+      # TIP: use specific version in production
+      - shell: bash
+        run: deno run -A https://deno.land/x/edcb/cli.ts
+      # Alternatively, run your own build script:
+      # run: deno run -A cli.ts
 END_HEREDOC
 )
 
