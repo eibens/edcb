@@ -1,4 +1,4 @@
-import { exists } from "https://deno.land/std@0.103.0/fs/mod.ts";
+import { exists } from "https://deno.land/std@0.103.0/fs/exists.ts";
 import { dirname } from "https://deno.land/std@0.103.0/path/mod.ts";
 import { getTag, getUrl } from "./version.ts";
 
