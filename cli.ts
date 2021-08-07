@@ -1,69 +1,57 @@
 import {
   blue,
-  cyan,
+  bold,
   gray,
   green,
+  italic,
   magenta,
   red,
-} from "https://deno.land/std@0.101.0/fmt/colors.ts";
-import { dirname, join } from "https://deno.land/std@0.101.0/path/mod.ts";
+  underline,
+} from "https://deno.land/x/std@0.103.0/fmt/colors.ts";
+import * as init from "./init.ts";
+import * as build from "./build.ts";
+import { getTag } from "./version.ts";
+import { parse } from "https://deno.land/std@0.103.0/flags/mod.ts";
 
 if (import.meta.main) {
-  if (Deno.args[0] === "upgrade") {
-    console.info(
-      "[edcb] use `deno install -f -A https://deno.land/x/edcb/cli.ts`",
-    );
-    console.error(red("[edcb] CLI does not yet support `upgrade`"));
-    Deno.exit(1);
-  }
-
-  const file = await install();
-
-  console.log(blue("[edcb] file: " + file));
-  console.log(cyan("[edcb] running"));
-
-  const process = Deno.run({
-    cmd: ["bash", file, ...Deno.args],
-  });
-
-  console.log(gray("-".repeat(32)));
-  const status = await process.status();
-  console.log(gray("-".repeat(32)));
-
-  if (status.success) {
-    console.log(green("[edcb] succeeded"));
+  logProp("command", bold(Deno.args[0] === "init" ? "init" : "build"));
+  logProp("version", getTag() || bold("implicit"));
+  if (Deno.args[0] === "init") {
+    const [_, ...args] = Deno.args;
+    const flags: Record<string, unknown> = parse(args, {
+      string: "version",
+    });
+    logProp("file", underline(blue(init.WORKFLOW_FILE)));
+    const created = await init.main(flags);
+    logProp("created", bold(String(created)));
+    if (!created) log(italic("File was not created, since it already exists."));
   } else {
-    console.error(red("[edcb] failed"));
-    Deno.exit(1);
+    const flags: Record<string, unknown> = parse(Deno.args, {
+      boolean: "ci",
+      string: "ignore",
+    });
+    logDivider();
+    let status = green("success");
+    try {
+      await build.main(flags);
+    } catch (error) {
+      logProp("error", red(String(error)));
+      status = red("failure");
+    }
+    logDivider();
+    logProp("status", status);
   }
 }
 
-async function install(): Promise<string> {
-  // Locate edcb.sh script file.
-  const url = new URL(import.meta.url);
-  url.pathname = join(dirname(url.pathname), "edcb.sh");
+function log(message: string) {
+  const tag = gray("[" + magenta(bold("edcb")) + "]");
+  console.log(`${tag} ${message}`);
+}
 
-  // Log version.
-  const match = url.pathname.match(/v[0-9]+\.[0-9]+\.[0-9]+/);
-  const version = match ? match[0] : "unknown";
-  console.log(magenta("[edcb] version: " + version));
+function logProp(prop: string, value: string) {
+  log(`${prop}: ${value}`);
+}
 
-  switch (url.protocol) {
-    case "file:": {
-      return url.pathname;
-    }
-    case "http:":
-    case "https:": {
-      console.log(blue("[edcb] url:" + url));
-      console.log(cyan("[edcb] downloading"));
-      const script = await (await fetch(url)).text();
-
-      console.log(cyan("[edcb] installing"));
-      const tmpFile = (await Deno.makeTempFile()) + ".edcb.sh";
-      await Deno.writeTextFile(tmpFile, script);
-      return tmpFile;
-    }
-    default:
-      throw new Error("[edcb] unknown source protocol");
-  }
+function logDivider() {
+  console.log(gray("-".repeat(60)));
 }
