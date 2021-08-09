@@ -29,7 +29,7 @@ export const WORKFLOW_FILE = ".github/workflows/ci.yml";
  * @returns a promise that resolves to `true` if a new file was created,
  * or `false` if the file already existed and nothing was written.
  */
-export async function main(options: Options): Promise<boolean> {
+export async function main(options: Options = {}): Promise<boolean> {
   const file = WORKFLOW_FILE;
 
   // NOTE: Don't overwrite existing workflow file.

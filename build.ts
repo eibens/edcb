@@ -29,7 +29,7 @@ export type Options = {
  * @param options is the configuration for the build workflow.
  * @throws if a step in the workflow fails.
  */
-export async function main(options: Options) {
+export async function main(options: Options = {}) {
   const ignore = "--ignore=" + options.ignore;
 
   const ci = options.ci || Deno.env.get("CI") !== undefined;
