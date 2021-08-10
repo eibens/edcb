@@ -4,7 +4,7 @@
 environment. Since [edcb] is itself implemented in TypeScript for [Deno], it is
 used to build itself.
 
-[![License][license-shield]](LICENSE) [![Deno doc][deno-doc-shield]][deno-doc]
+[![License][license-shield]](LICENSE)
 [![Deno module][deno-land-shield]][deno-land]
 [![Github
 tag][github-shield]][github] [![Build][build-shield]][build]
@@ -91,7 +91,5 @@ edcb init --force
 [coverage]: https://codecov.io/gh/eibens/edcb
 [build]: https://github.com/eibens/edcb/actions/workflows/ci.yml
 [build-shield]: https://img.shields.io/github/workflow/status/eibens/edcb/ci?logo=github&label
-[deno-doc]: https://doc.deno.land/https/deno.land/x/edcb/example.ts
-[deno-doc-shield]: https://img.shields.io/badge/doc-informational?logo=deno
 [deno-land]: https://deno.land/x/edcb
 [deno-land-shield]: https://img.shields.io/badge/x/edcb-informational?logo=deno&label
