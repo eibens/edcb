@@ -6,8 +6,10 @@ used to build itself.
 
 [![License][license-shield]](LICENSE) [![Deno doc][deno-doc-shield]][deno-doc]
 [![Deno module][deno-land-shield]][deno-land]
-[![Github tag][github-shield]][github] [![Build][build-shield]][build]
-[![Code coverage][coverage-shield]][coverage]
+[![Github
+tag][github-shield]][github] [![Build][build-shield]][build]
+[![Code
+coverage][coverage-shield]][coverage]
 
 # Motivation
 
@@ -16,22 +18,13 @@ formatted, linted, and tested. This workflow is usually very similar across
 projects. [edcb] is an attempt of generalizing these tasks across projects and
 across local systems and CI environments.
 
-# Install
+# Usage
 
 The [edcb] CLI can be installed with [Deno].
 
 ```sh
 deno install -f -A https://deno.land/x/edcb/cli.ts
 ```
-
-The [edcb] version can be specified in the URL.
-
-```sh
-# Replace {ref} with the desired Git tag or branch.
-deno install -f -A https://deno.land/x/edcb@{ref}/cli.ts
-```
-
-# Usage
 
 After installation, building a project is as simple as running [edcb] in the
 project root.
@@ -68,13 +61,19 @@ export CI=true
 edcb
 ```
 
-The [ci.yml](.github/workflows/ci.yml) workflow file demonstrates how [edcb] can
-be used with [GitHub Actions]. The `init` command generates the workflow file
-automatically.
+The `init` command generates a set of boilerplate files.
+
+- [dev.ts](dev.ts) script for building the repository. It can be run with
+  `deno run -A dev.ts`.
+- [.github/workflows/ci.yml](.github/workflows/ci.yml) runs `dev.ts` on GitHub
+  Actions.
 
 ```sh
-# Generates the workflow file for GitHub Actions.
+# Generates missing files.
 edcb init
+
+# Generates and overwrites files.
+edcb init --force
 ```
 
 [edcb]: #

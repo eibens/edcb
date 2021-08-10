@@ -1,16 +1,18 @@
+import { createLogger, Logger } from "./logger.ts";
+
 /**
  * Defines configuration for the build workflow.
  */
-export type Options = {
+export type BuildOptions = {
   /**
    * Directory that contains the source files.
    */
-  cwd?: string;
+  cwd: string;
 
   /**
    * Flag indicating that the build should be run as if in a CI environment.
    */
-  ci?: boolean;
+  ci: boolean;
 
   /**
    * Files and directories that should not be formatted or linted.
@@ -18,7 +20,13 @@ export type Options = {
    * Corresponds to the format used for the `--ignore` flag for `deno fmt`
    * or `deno lint`.
    */
-  ignore?: string;
+  ignore: string;
+
+  logger: Logger;
+
+  env: {
+    get: (name: "CI") => string | undefined;
+  };
 };
 
 /**
@@ -29,25 +37,30 @@ export type Options = {
  * @param options is the configuration for the build workflow.
  * @throws if a step in the workflow fails.
  */
-export async function main(options: Options) {
-  const ignore = "--ignore=" + options.ignore;
+export async function build(options: Partial<BuildOptions> = {}) {
+  const ignore = options.ignore ? ["--ignore=" + options.ignore] : [];
 
-  const ci = options.ci || Deno.env.get("CI") !== undefined;
+  const logger = options.logger ||
+    createLogger({ name: "edcb build", handler: console.log });
+
+  const env = options.env || Deno.env;
+  const ci = options.ci || env.get("CI") !== undefined;
 
   // Format code (check but don't modify code in CI).
   if (ci) {
+    logger.info("formatter is running with --check");
     await run({
-      cmd: ["deno", "fmt", ignore, "--check"],
+      cmd: ["deno", "fmt", ...ignore, "--check"],
     });
   } else {
     await run({
-      cmd: ["deno", "fmt", ignore],
+      cmd: ["deno", "fmt", ...ignore],
     });
   }
 
   // Run linter after formatting, since it is more high-level.
   await run({
-    cmd: ["deno", "lint", ignore],
+    cmd: ["deno", "lint", ...ignore],
   });
 
   // Store coverage outside project root.
@@ -96,8 +109,10 @@ export async function main(options: Options) {
   async function run(options: Deno.RunOptions): Promise<Uint8Array> {
     const p = Deno.run({ cwd: options.cwd, ...options });
     try {
+      logger.start(`$ ${options.cmd.join(" ")}`);
       const status = await p.status();
       if (!status.success) {
+        logger.error(`step failed`);
         throw new Error(`step failed: ${options.cmd.join(" ")}`);
       }
       if (options.stdout === "piped") {
@@ -117,15 +132,15 @@ export async function main(options: Options) {
 /**
  * Documents a necessary permission.
  */
-export type Permission = Deno.PermissionDescriptor & {
+export type BuildPermission = Deno.PermissionDescriptor & {
   reason: string;
 };
 
 /**
- * Get known permissions required for running the `main` function.
+ * Get known permissions required for running the `build` function.
  */
-export function getPermissions(options: Options): Permission[] {
-  const all: Permission[] = [{
+export function getBuildPermissions(options: BuildOptions): BuildPermission[] {
+  const all: BuildPermission[] = [{
     name: "run",
     command: "deno",
     reason: "Used for formatting, linting, testing, and coverage reporting.",
@@ -139,7 +154,7 @@ export function getPermissions(options: Options): Permission[] {
     reason: "Automatically detect CI environment.",
   }];
 
-  const ci: Permission[] = [{
+  const ci: BuildPermission[] = [{
     name: "net",
     host: "codecov.io",
     reason: "Used for downloading the codecov upload script.",

@@ -1,57 +1,39 @@
-import {
-  blue,
-  bold,
-  gray,
-  green,
-  italic,
-  magenta,
-  red,
-  underline,
-} from "https://deno.land/x/std@0.103.0/fmt/colors.ts";
-import * as init from "./init.ts";
-import * as build from "./build.ts";
-import { getTag } from "./version.ts";
+import * as edcb from "./mod.ts";
 import { parse } from "https://deno.land/std@0.103.0/flags/mod.ts";
+import { createLogger } from "./logger.ts";
+import { version } from "./version.ts";
+import { BuildOptions, InitOptions } from "./mod.ts";
 
 if (import.meta.main) {
-  logProp("command", bold(Deno.args[0] === "init" ? "init" : "build"));
-  logProp("version", getTag() || bold("implicit"));
-  if (Deno.args[0] === "init") {
-    const [_, ...args] = Deno.args;
-    const flags: Record<string, unknown> = parse(args, {
-      string: "version",
-    });
-    logProp("file", underline(blue(init.WORKFLOW_FILE)));
-    const created = await init.main(flags);
-    logProp("created", bold(String(created)));
-    if (!created) log(italic("File was not created, since it already exists."));
-  } else {
-    const flags: Record<string, unknown> = parse(Deno.args, {
-      boolean: "ci",
-      string: "ignore",
-    });
-    logDivider();
-    let status = green("success");
-    try {
-      await build.main(flags);
-    } catch (error) {
-      logProp("error", red(String(error)));
-      status = red("failure");
+  const logger = createLogger();
+  logger.start("started");
+  logger.info("version: " + (version.tag || "<unknown>"));
+  try {
+    if (Deno.args[0] === "init") {
+      await init();
+    } else {
+      await build();
     }
-    logDivider();
-    logProp("status", status);
+    logger.success("success");
+  } catch (error) {
+    console.log(error);
+    logger.error("failure");
+    Deno.exit(1);
   }
 }
 
-function log(message: string) {
-  const tag = gray("[" + magenta(bold("edcb")) + "]");
-  console.log(`${tag} ${message}`);
+export async function init(options: Partial<InitOptions> = {}) {
+  const flags: Record<string, unknown> = parse(Deno.args, {
+    boolean: ["ci"],
+    string: "ignore",
+  });
+  await edcb.init({ ...flags, ...options });
 }
 
-function logProp(prop: string, value: string) {
-  log(`${prop}: ${value}`);
-}
-
-function logDivider() {
-  console.log(gray("-".repeat(60)));
+export async function build(options: Partial<BuildOptions> = {}) {
+  const flags: Record<string, unknown> = parse(Deno.args, {
+    boolean: ["ci"],
+    string: "ignore",
+  });
+  await edcb.build({ ...flags, ...options });
 }
