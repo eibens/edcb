@@ -100,6 +100,5 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: denoland/setup-deno@v1
-      - shell: bash
-        run: deno run -A dev.ts\n`;
+      - run: deno run -A dev.ts\n`;
 }
