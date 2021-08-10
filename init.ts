@@ -43,7 +43,7 @@ export async function init(options: Partial<InitOptions> = {}) {
     ...options,
   };
   await writeFile(WORKFLOW_FILE, generateWorkflow(), opts);
-  await writeFile(DEV_FILE, generateDev(), opts);
+  await writeFile(DEV_FILE, generateDev(opts.version), opts);
 }
 
 /**
