@@ -48,7 +48,7 @@ function mockFetch(
 function mockRun(
   handler?: (options: Deno.RunOptions) => void,
 ): BuildDependencies["run"] {
-  return (options) => {
+  return (options: Deno.RunOptions) => {
     if (handler) handler(options);
     return {
       close: () => void (0),
