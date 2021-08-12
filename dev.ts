@@ -1,3 +1,3 @@
-import { build } from "./cli.ts";
+import { cli } from "./cli.ts";
 
-await build();
+await cli();

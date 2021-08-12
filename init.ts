@@ -1,12 +1,33 @@
-import { exists } from "https://deno.land/std@0.103.0/fs/exists.ts";
-import { dirname } from "https://deno.land/std@0.103.0/path/mod.ts";
-import { createLogger, Logger } from "./logger.ts";
-import { version } from "./version.ts";
+import { dirname, join } from "https://deno.land/std@0.103.0/path/mod.ts";
+import {
+  fromTaskNameHandler,
+  TaskHandler,
+  TaskNameHandler,
+  toTask,
+} from "./utils/task.ts";
+
+/**
+ * Defines event hooks for monitoring the initialization process.
+ */
+export type InitHandlers = {
+  writeFile: TaskHandler<[string, Uint8Array]>;
+  mkdir: TaskHandler<[string]>;
+  lstat: TaskHandler<[string], Deno.FileInfo>;
+};
+
+/**
+ * Defines injectable dependencies for the build function.
+ */
+export type InitDependencies = {
+  writeFile: (typeof Deno)["writeFile"];
+  mkdir: (typeof Deno)["mkdir"];
+  lstat: (typeof Deno)["lstat"];
+};
 
 /**
  * Defines options for edcb initialization.
  */
-export type InitOptions = {
+export type InitOptions = InitDependencies & {
   /**
    * Version of edcb that should be used.
    *
@@ -19,79 +40,89 @@ export type InitOptions = {
    */
   force: boolean;
 
-  logger: Logger;
-};
+  /**
+   * Root directory of the project.
+   */
+  cwd: string;
 
-const WORKFLOW_FILE = ".github/workflows/ci.yml";
-const DEV_FILE = "dev.ts";
-
-/**
- * Initializes edcb support in a directory.
- *
- * For now, this simply generates a GitHub Actions workflow file.
- *
- * See `getPermissions` for necessary permissions.
- *
- * @returns a promise that resolves to `true` if a new file was created,
- * or `false` if the file already existed and nothing was written.
- */
-export async function init(options: Partial<InitOptions> = {}) {
-  const opts: InitOptions = {
-    force: false,
-    version: version.tag,
-    logger: createLogger({ name: "edcb init" }),
-    ...options,
-  };
-  await writeFile(WORKFLOW_FILE, generateWorkflow(), opts);
-  await writeFile(DEV_FILE, generateDev(opts.version), opts);
-}
-
-/**
- * Documents a necessary permission.
- */
-export type InitPermission = Deno.PermissionDescriptor & {
-  reason: string;
+  /**
+   * Object that holds initialization event handlers.
+   */
+  handlers: InitHandlers;
 };
 
 /**
- * Get known permissions required for running the `init` function.
+ * Initializes boilerplate edcb related files in a directory.
  */
-export function getInitPermissions(): InitPermission[] {
-  return [{
-    name: "read",
-    path: WORKFLOW_FILE,
-    reason: "Checking the existence of the GitHub Actions workflow file.",
-  }, {
-    name: "write",
-    path: WORKFLOW_FILE,
-    reason: "Creating a new GitHub Actions workflow file.",
-  }];
-}
+export async function init(options: InitOptions) {
+  const handler = fromTaskNameHandler(
+    options.handlers as TaskNameHandler,
+  );
 
-async function writeFile(file: string, text: string, options: InitOptions) {
-  const { logger } = options;
-  // NOTE: Don't overwrite existing workflow file.
-  if (await exists(file)) {
-    if (!options.force) {
-      logger.info(`skipped existing file: ${file}`);
-      return;
+  // Wrap dependencies.
+
+  const mkdir = toTask(
+    "mkdir",
+    handler,
+    options.mkdir,
+  );
+
+  const lstat = toTask(
+    "lstat",
+    handler,
+    options.lstat,
+  );
+
+  const writeFile = toTask(
+    "writeFile",
+    handler,
+    options.writeFile,
+  );
+
+  // Run process
+
+  const workflowFile = join(options.cwd, ".github/workflows/ci.yml");
+  await writeTextFile(workflowFile, generateWorkflowFile());
+
+  const devFile = join(options.cwd, "dev.ts");
+  await writeTextFile(devFile, generateDevFile(options.version));
+
+  // Define helpers.
+
+  async function writeTextFile(file: string, text: string) {
+    // NOTE: Don't overwrite existing workflow file.
+    if (await exists(file)) {
+      if (!options.force) return;
+    }
+    await mkdir(dirname(file), { recursive: true });
+    const data = new TextEncoder().encode(text);
+    await writeFile(file, data);
+  }
+
+  async function exists(file: string) {
+    try {
+      await lstat(file);
+      return true;
+    } catch (error) {
+      if (error instanceof Deno.errors.NotFound) {
+        return false;
+      }
+      throw error;
     }
   }
-  logger.start(`writing ${text.length} bytes to file: ${file}`);
-  await Deno.mkdir(dirname(file), { recursive: true });
-  await Deno.writeTextFile(file, text);
-  return true;
 }
 
-function generateDev(version?: string) {
+// File templates
+
+function generateDevFile(version?: string) {
   const tag = version ? `@${version}` : "";
   const edcbUrl = `https://deno.land/x/edcb${tag}/cli.ts`;
-  return `import { build } from "${edcbUrl}";
+  return `import { cli } from "${edcbUrl}";
 
-await build();\n`;
+await cli();\n`;
 }
 
-function generateWorkflow() {
+function generateWorkflowFile() {
   return `name: ci
 on: [push, pull_request]
 jobs:

@@ -1,18 +1,47 @@
-import { createLogger, Logger } from "./logger.ts";
+import { join } from "https://deno.land/std@0.103.0/path/mod.ts";
+import {
+  fromTaskNameHandler,
+  runTask,
+  TaskHandler,
+  TaskNameHandler,
+  toTask,
+} from "./utils/task.ts";
+import { run as runImpl } from "./utils/run.ts";
+
+/**
+ * Defines event hooks for monitoring the build process.
+ */
+export type BuildHandlers = {
+  run: TaskHandler<[Deno.RunOptions], Uint8Array>;
+  writeFile: TaskHandler<[string, Uint8Array]>;
+  mkdir: TaskHandler<[string]>;
+  fetch: TaskHandler<[Request], Response>;
+  format: TaskHandler<[boolean]>;
+  lint: TaskHandler;
+  test: TaskHandler;
+  coverage: TaskHandler;
+  lcov: TaskHandler;
+  codecov: TaskHandler;
+};
+
+/**
+ * Defines injectable dependencies for the build function.
+ */
+export type BuildDependencies = {
+  writeFile: (typeof Deno)["writeFile"];
+  mkdir: (typeof Deno)["mkdir"];
+  run: (typeof Deno)["run"];
+  fetch: typeof fetch;
+};
 
 /**
  * Defines configuration for the build workflow.
  */
-export type BuildOptions = {
+export type BuildOptions = BuildDependencies & {
   /**
-   * Directory that contains the source files.
+   * Root directory of the project.
    */
   cwd: string;
-
-  /**
-   * Flag indicating that the build should be run as if in a CI environment.
-   */
-  ci: boolean;
 
   /**
    * Files and directories that should not be formatted or linted.
@@ -22,146 +51,136 @@ export type BuildOptions = {
    */
   ignore: string;
 
-  logger: Logger;
+  /**
+   * Flag indicating that the build should be run as if in a CI environment.
+   */
+  ci: boolean;
 
-  env: {
-    get: (name: "CI") => string | undefined;
-  };
+  /**
+   * Path where temporary files will be stored.
+   */
+  tempDir: string;
+
+  /**
+   * Object that holds build event handlers.
+   */
+  handlers: BuildHandlers;
 };
 
 /**
  * Runs the edcb build workflow.
  *
- * See `getPermissions` for necessary permissions.
- *
  * @param options is the configuration for the build workflow.
  * @throws if a step in the workflow fails.
  */
-export async function build(options: Partial<BuildOptions> = {}) {
-  const ignore = options.ignore ? ["--ignore=" + options.ignore] : [];
+export async function build(options: BuildOptions) {
+  const handler = fromTaskNameHandler(
+    options.handlers as TaskNameHandler,
+  );
 
-  const logger = options.logger ||
-    createLogger({ name: "edcb build", handler: console.log });
+  // Wrap dependencies.
 
-  const env = options.env || Deno.env;
-  const ci = options.ci || env.get("CI") !== undefined;
+  const fetch = toTask(
+    "fetch",
+    handler,
+    options.fetch,
+  );
 
-  // Format code (check but don't modify code in CI).
-  if (ci) {
-    logger.info("formatter is running with --check");
-    await run({
-      cmd: ["deno", "fmt", ...ignore, "--check"],
-    });
-  } else {
-    await run({
-      cmd: ["deno", "fmt", ...ignore],
-    });
-  }
+  const mkdir = toTask(
+    "mkdir",
+    handler,
+    options.mkdir,
+  );
 
-  // Run linter after formatting, since it is more high-level.
-  await run({
-    cmd: ["deno", "lint", ...ignore],
+  const writeFile = toTask(
+    "writeFile",
+    handler,
+    options.writeFile,
+  );
+
+  const run = toTask(
+    "run",
+    handler,
+    async (command: Deno.RunOptions) => {
+      return await runImpl({
+        cwd: options.cwd,
+        ...command,
+      }, options.run);
+    },
+  );
+
+  // Run tasks
+
+  const ignore = ["--ignore=" + options.tempDir, options.ignore].join(",");
+  await runTask("format", handler, [options.ci], async (check) => {
+    if (check) {
+      // Check but don't modify code in CI.
+      await run({
+        cmd: ["deno", "fmt", ignore, "--check"],
+      });
+    } else {
+      await run({
+        cmd: ["deno", "fmt", ignore],
+      });
+    }
   });
 
-  // Store coverage outside project root.
-  const covDir = await Deno.makeTempDir();
+  // Run linter after formatting, since it is more high-level.
+  await runTask("lint", handler, [], async () => {
+    await run({
+      cmd: ["deno", "lint", ignore],
+    });
+  });
+
+  // Paths for storing generated data outside project root.
+  await mkdir(options.tempDir, { recursive: true });
+  const covDir = join(options.tempDir, "coverage");
+  const covFile = join(covDir, "coverage.lcov");
+  const scriptFile = join(options.tempDir, "codecov.bash");
 
   // Run tests and generate coverage profile.
-  await run({
-    cmd: ["deno", "test", "-A", "--unstable", "--coverage=" + covDir],
+  await runTask("test", handler, [], async () => {
+    await run({
+      cmd: ["deno", "test", "-A", "--unstable", "--coverage=" + covDir],
+    });
   });
 
   // Print coverage info to stdout.
-  await run({
-    cmd: ["deno", "coverage", "--unstable", covDir],
+  await runTask("coverage", handler, [], async () => {
+    await run({
+      cmd: ["deno", "coverage", "--unstable", covDir],
+    });
   });
 
   // Upload code coverage (only works from CI, at least for now).
-  if (ci) {
+  if (options.ci) {
     // Generate coverage file.
-    const lcov = await run({
-      cmd: ["deno", "coverage", "--lcov", covDir],
-      stdout: "piped",
+    await runTask("lcov", handler, [], async () => {
+      const lcov = await run({
+        cmd: ["deno", "coverage", "--lcov", covDir],
+        stdout: "piped",
+      });
+
+      // Store coverage report outside project root.
+      await writeFile(covFile, lcov);
     });
 
-    // Store coverage report outside project root.
-    const covFile = await Deno.makeTempFile();
-    Deno.writeFile(covFile, lcov);
+    await runTask("codecov", handler, [], async () => {
+      // Download codecov upload script.
+      const scriptUrl = "https://codecov.io/bash";
+      const scriptBash = await (await fetch(scriptUrl))
+        .arrayBuffer();
+      await writeFile(scriptFile, new Uint8Array(scriptBash));
 
-    // Download codecov upload script.
-    const scriptUrl = "https://codecov.io/bash";
-    const scriptBash = await (await fetch(scriptUrl)).text();
-    const scriptFile = await Deno.makeTempFile();
-    await Deno.writeTextFile(scriptFile, scriptBash);
+      // Make executable.
+      await run({
+        cmd: ["chmod", "+x", scriptFile],
+      });
 
-    // Make executable.
-    await run({
-      cmd: ["chmod", "+x", scriptFile],
-    });
-
-    // Upload coverage file.
-    await run({
-      cmd: [scriptFile, "-f", covFile],
+      // Upload coverage file.
+      await run({
+        cmd: [scriptFile, "-f", covFile],
+      });
     });
   }
-
-  // Define run helper.
-  async function run(options: Deno.RunOptions): Promise<Uint8Array> {
-    const p = Deno.run({ cwd: options.cwd, ...options });
-    try {
-      logger.start(`$ ${options.cmd.join(" ")}`);
-      const status = await p.status();
-      if (!status.success) {
-        logger.error(`step failed`);
-        throw new Error(`step failed: ${options.cmd.join(" ")}`);
-      }
-      if (options.stdout === "piped") {
-        return await p.output();
-      } else {
-        return new Uint8Array(0);
-      }
-    } finally {
-      if (options.stdout !== "piped") p.stdout?.close();
-      p.stderr?.close();
-      p.stdin?.close;
-      p.close();
-    }
-  }
-}
-
-/**
- * Documents a necessary permission.
- */
-export type BuildPermission = Deno.PermissionDescriptor & {
-  reason: string;
-};
-
-/**
- * Get known permissions required for running the `build` function.
- */
-export function getBuildPermissions(options: BuildOptions): BuildPermission[] {
-  const all: BuildPermission[] = [{
-    name: "run",
-    command: "deno",
-    reason: "Used for formatting, linting, testing, and coverage reporting.",
-  }, {
-    name: "write",
-    path: "tmp",
-    reason: "Used for storing the coverage data in a temporary directory.",
-  }, {
-    name: "env",
-    variable: "CI",
-    reason: "Automatically detect CI environment.",
-  }];
-
-  const ci: BuildPermission[] = [{
-    name: "net",
-    host: "codecov.io",
-    reason: "Used for downloading the codecov upload script.",
-  }, {
-    name: "run",
-    reason: "Used for running the codecov upload script.",
-  }];
-
-  return [...all, ...(options.ci ? ci : [])];
 }
