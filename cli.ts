@@ -91,7 +91,6 @@ function handleRun(): CheckHandlers["run"] {
   return fromTaskKindHandler({
     post: handlePost(),
     pre: (state) => {
-      console.log(gray("-".repeat(60)));
       log(state, bgBlack(state.input[0].cmd.join(" ")));
     },
   });
