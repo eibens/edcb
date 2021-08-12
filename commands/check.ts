@@ -5,13 +5,13 @@ import {
   TaskHandler,
   TaskNameHandler,
   toTask,
-} from "./utils/task.ts";
-import { run as runImpl } from "./utils/run.ts";
+} from "../utils/task.ts";
+import { run as runImpl } from "../utils/run.ts";
 
 /**
- * Defines event hooks for monitoring the build process.
+ * Defines event hooks for monitoring the check process.
  */
-export type BuildHandlers = {
+export type CheckHandlers = {
   run: TaskHandler<[Deno.RunOptions], Uint8Array>;
   writeFile: TaskHandler<[string, Uint8Array]>;
   mkdir: TaskHandler<[string]>;
@@ -25,9 +25,9 @@ export type BuildHandlers = {
 };
 
 /**
- * Defines injectable dependencies for the build function.
+ * Defines injectable dependencies for the check function.
  */
-export type BuildDependencies = {
+export type CheckDependencies = {
   writeFile: (typeof Deno)["writeFile"];
   mkdir: (typeof Deno)["mkdir"];
   run: (typeof Deno)["run"];
@@ -35,9 +35,9 @@ export type BuildDependencies = {
 };
 
 /**
- * Defines configuration for the build workflow.
+ * Defines configuration for the check workflow.
  */
-export type BuildOptions = BuildDependencies & {
+export type CheckOptions = CheckDependencies & {
   /**
    * Root directory of the project.
    */
@@ -52,7 +52,7 @@ export type BuildOptions = BuildDependencies & {
   ignore: string;
 
   /**
-   * Flag indicating that the build should be run as if in a CI environment.
+   * Flag indicating that the checks should be run as if in a CI environment.
    */
   ci: boolean;
 
@@ -62,18 +62,18 @@ export type BuildOptions = BuildDependencies & {
   tempDir: string;
 
   /**
-   * Object that holds build event handlers.
+   * Object that holds check event handlers.
    */
-  handlers: BuildHandlers;
+  handlers: CheckHandlers;
 };
 
 /**
- * Runs the edcb build workflow.
+ * Runs the check workflow.
  *
- * @param options is the configuration for the build workflow.
+ * @param options is the configuration for the check workflow.
  * @throws if a step in the workflow fails.
  */
-export async function build(options: BuildOptions) {
+export async function check(options: CheckOptions) {
   const handler = fromTaskNameHandler(
     options.handlers as TaskNameHandler,
   );

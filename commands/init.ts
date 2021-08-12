@@ -4,7 +4,7 @@ import {
   TaskHandler,
   TaskNameHandler,
   toTask,
-} from "./utils/task.ts";
+} from "../utils/task.ts";
 
 /**
  * Defines event hooks for monitoring the initialization process.

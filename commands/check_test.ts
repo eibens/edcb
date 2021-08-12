@@ -1,29 +1,29 @@
-import { build, BuildDependencies, BuildHandlers } from "./build.ts";
-import { toTaskNameHandler } from "./utils/task.ts";
+import { check, CheckDependencies, CheckHandlers } from "./check.ts";
+import { toTaskNameHandler } from "../utils/task.ts";
 
-Deno.test("build runs with mocked dependencies`", async () => {
-  await build({
+Deno.test("check runs with mocked dependencies`", async () => {
+  await check({
     ...mockDeps(),
     ci: false,
     tempDir: "temp",
     cwd: ".",
     ignore: "foo",
-    handlers: toTaskNameHandler(() => {}) as BuildHandlers,
+    handlers: toTaskNameHandler(() => {}) as CheckHandlers,
   });
 });
 
 Deno.test("build runs with mocked dependencies in CI`", async () => {
-  await build({
+  await check({
     ...mockDeps(),
     ci: true,
     tempDir: "temp",
     cwd: ".",
     ignore: "foo",
-    handlers: toTaskNameHandler(() => {}) as BuildHandlers,
+    handlers: toTaskNameHandler(() => {}) as CheckHandlers,
   });
 });
 
-function mockDeps(options: Partial<BuildDependencies> = {}): BuildDependencies {
+function mockDeps(options: Partial<CheckDependencies> = {}): CheckDependencies {
   return {
     fetch: mockFetch(),
     run: mockRun(),
@@ -35,7 +35,7 @@ function mockDeps(options: Partial<BuildDependencies> = {}): BuildDependencies {
 
 function mockFetch(
   handler?: (url: string) => void,
-): BuildDependencies["fetch"] {
+): CheckDependencies["fetch"] {
   return (url) => {
     if (typeof url !== "string") throw new Error("not implemented");
     if (handler) handler(url);
@@ -47,7 +47,7 @@ function mockFetch(
 
 function mockRun(
   handler?: (options: Deno.RunOptions) => void,
-): BuildDependencies["run"] {
+): CheckDependencies["run"] {
   return (options: Deno.RunOptions) => {
     if (handler) handler(options);
     return {

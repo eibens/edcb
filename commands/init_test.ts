@@ -1,5 +1,5 @@
 import { init, InitDependencies, InitHandlers } from "./init.ts";
-import { toTaskNameHandler } from "./utils/task.ts";
+import { toTaskNameHandler } from "../utils/task.ts";
 
 Deno.test("init runs with mock dependencies", async () => {
   await init({

@@ -1,6 +1,11 @@
 import * as edcb from "./mod.ts";
-import { parseBuildFlags, parseInitFlags } from "./flags.ts";
-import { BuildHandlers, InitHandlers, version } from "./mod.ts";
+import {
+  CheckHandlers,
+  createCheckOptions,
+  createInitOptions,
+  InitHandlers,
+  version,
+} from "./mod.ts";
 import {
   fromTaskKindHandler,
   runTask,
@@ -26,33 +31,44 @@ if (import.meta.main) {
 }
 
 export async function cli() {
-  if (Deno.args[0] === "init") {
-    const options = await parseInitFlags({
-      handlers: {
-        lstat: handleLstat(),
-        writeFile: handleWriteFile(),
-      },
-    });
-    await runTask(
-      "edcb",
-      handleEdcb(),
-      [options],
-      edcb.init,
-    );
+  const [command] = Deno.args;
+  if (command === "init") {
+    await init();
+  } else if (command === "check") {
+    await check();
   } else {
-    const options = await parseBuildFlags({
-      handlers: {
-        run: handleRun(),
-        writeFile: handleWriteFile(),
-      },
-    });
-    await runTask(
-      "edcb",
-      handleEdcb(),
-      [options],
-      edcb.build,
-    );
+    await check();
   }
+}
+
+async function init() {
+  const options = await createInitOptions({
+    handlers: {
+      lstat: handleLstat(),
+      writeFile: handleWriteFile(),
+    },
+  });
+  await runTask(
+    "edcb",
+    handleEdcb(),
+    [options],
+    edcb.init,
+  );
+}
+
+async function check() {
+  const options = await createCheckOptions({
+    handlers: {
+      run: handleRun(),
+      writeFile: handleWriteFile(),
+    },
+  });
+  await runTask(
+    "edcb",
+    handleEdcb(),
+    [options],
+    edcb.check,
+  );
 }
 
 function handleEdcb() {
@@ -71,7 +87,7 @@ function handlePost() {
   };
 }
 
-function handleRun(): BuildHandlers["run"] {
+function handleRun(): CheckHandlers["run"] {
   return fromTaskKindHandler({
     post: handlePost(),
     pre: (state) => {
@@ -81,7 +97,7 @@ function handleRun(): BuildHandlers["run"] {
   });
 }
 
-function handleWriteFile(): BuildHandlers["writeFile"] {
+function handleWriteFile(): CheckHandlers["writeFile"] {
   return fromTaskKindHandler({
     post: handlePost(),
     pre: (state) => {
