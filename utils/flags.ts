@@ -1,14 +1,17 @@
 import { parse } from "https://deno.land/std@0.103.0/flags/mod.ts";
 
-export type ParseFlagsOptions<B, S> = {
+export type ParseFlagsOptions<B extends string, S extends string> = {
   string: S[];
   boolean: B[];
+  default:
+    & { [k in B]: boolean }
+    & { [k in S]: string };
 };
 
 export type ParseFlagsResult<B extends string, S extends string> =
   & { _: string[] }
-  & { [k in B]?: boolean }
-  & { [k in S]?: string };
+  & { [k in B]: boolean }
+  & { [k in S]: string };
 
 export function parseFlags<B extends string, S extends string>(
   args: string[],

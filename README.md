@@ -1,8 +1,8 @@
 # [edcb]
 
-[edcb] is a workflow for building a [Deno] project locally and in a CI
-environment. Since [edcb] is itself implemented in TypeScript for [Deno], it is
-used to build itself.
+[edcb] is a tool for building a [Deno] project locally and in a CI environment.
+It has support for formatting, linting, testing, code coverage, bundling, and
+more, and it can be used via command line or TypeScript import.
 
 [![License][license-shield]](LICENSE)
 [![Deno module][deno-land-shield]][deno-land]
@@ -11,14 +11,7 @@ tag][github-shield]][github] [![Build][build-shield]][build]
 [![Code
 coverage][coverage-shield]][coverage]
 
-# Motivation
-
-In order to make a [Deno] project production ready, the code should be
-formatted, linted, and tested. This workflow is usually very similar across
-projects. [edcb] is an attempt of generalizing these tasks across projects and
-across local systems and CI environments.
-
-# Usage
+# CLI
 
 The [edcb] CLI can be installed with [Deno].
 
@@ -47,7 +40,7 @@ The `--ci` flag changes the behavior as follows:
 1. Runs the [Deno] formatter with the `--check` flag.
 2. Generates a test coverage file.
 3. Uploads the test coverage file to [codecov.io]. This step likely fails on
-   local systems, which is the intended behavior.
+   local systems.
 
 ```sh
 edcb --ci
@@ -61,12 +54,11 @@ export CI=true
 edcb
 ```
 
-The `init` command generates a set of boilerplate files.
+The `init` command generates boilerplate files.
 
-- [dev.ts](dev.ts) script for building the repository. It can be run with
-  `deno run -A dev.ts`.
-- [.github/workflows/ci.yml](.github/workflows/ci.yml) runs `dev.ts` on GitHub
-  Actions.
+- [dev.ts](dev.ts) builds the repository. Run it with `deno run -A dev.ts`.
+- [.github/workflows/ci.yml](.github/workflows/ci.yml) defines a CI workflow for
+  GitHub Actions.
 
 ```sh
 # Generates missing files.
@@ -74,13 +66,98 @@ edcb init
 
 # Generates and overwrites files.
 edcb init --force
+
+# Use a specific version of edcb in the dev.ts file.
+edcb init --version=1.2.3
+```
+
+# Configuration
+
+[edcb] can be configured by creating a TypeScript module named `dev.ts`. It
+should import [edcb] and call the `cli` function defined in [cli.ts](cli.ts)
+with custom options. For example, one can specify the `check.ignore` option,
+which will then be used if the `--ignore` option was not provided:
+
+```ts
+// NOTE: Change this URL to a specific version of edcb.
+import { cli } from "https://deno.land/x/edcb/cli.ts";
+
+await cli({
+  check: {
+    ignore: "docs",
+  },
+});
+```
+
+When `edcb` is run in a folder with a `dev.ts` file, it will pass the arguments
+to `deno run -A dev.ts` instead. This prevents a developer from accidentally
+building a project with a local [edcb] version that differs from the version
+defined in `dev.ts`. The GitHub Actions workflow file also runs `dev.ts` to
+avoid this problem.
+
+# Actions
+
+Actions implement the particular tasks that can be performed by [edcb]. Each
+action is defined through a _builder_ function, which takes a set of
+dependencies and returns an async action function. This separation of
+dependencies and options allows for loose coupling, testing with mocks, and the
+use of hooks to monitor or change action behavior. There are native actions
+without dependencies, such as `Deno.writeFile`, and
+[composed actions](actions/mod.ts) that depend on other actions, such as
+`check`, which uses `fmt`, `lint`, `codecov`, and others. Extending [edcb] with
+custom actions is currently not possible.
+
+# Hooks
+
+Hooks are a way of overriding [edcb]'s behavior. A hook is a function that
+receives a function and returns a function of the same type. For example, one
+could build a hook for the `write` action that prints the file size to the
+console like this:
+
+```ts
+import { cli } from "https://deno.land/x/edcb/mod.ts";
+
+await cli({
+  hooks: {
+    write: (write) => {
+      return (file, data) => {
+        console.log(`Writing ${data.length} bytes.`);
+        return await write(file, data);
+      };
+    },
+  },
+});
+```
+
+Per default, [edcb] uses the hooks defined in [loggers.ts](loggers.ts). When the
+`hooks` options is provided, the default hooks will be overridden. The `chain`
+function can be used to combine multiple hooks. In this example, the `write`
+action will throw if the file would be bigger than one megabyte. The error will
+then be handled by `loggers`:
+
+```ts
+import { cli, Hooks, loggers } from "https://deno.land/x/edcb/mod.ts";
+
+const customHooks: Hooks = {
+  write: (write) => {
+    return (file, data) => {
+      if (data.length > 1_000_000) {
+        throw new Error("file is too big");
+      }
+      return await write(file, data);
+    };
+  },
+};
+
+await cli({
+  hooks: chain(customHooks, loggers),
+});
 ```
 
 [edcb]: #
 [Deno]: https://deno.land
 [GitHub Actions]: https://github.com/features/actions
 [codecov.io]: https://codecov.io
-[answer.ts]: answer.ts
 
 <!-- badges -->
 
