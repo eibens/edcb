@@ -1,15 +1,16 @@
-import { exec, ExecDeps, ExecOptions } from "./exec.ts";
+import { exec, ExecOptions } from "./exec.ts";
 
 Deno.test("exec runs with mock options", async () => {
-  await exec(mockExecDeps())(mockExecOptions());
+  await exec(mockExecOptions());
 });
 
-function mockExecDeps(): ExecDeps {
+function mockExecOptions(): ExecOptions {
   return {
+    cmd: ["mock"],
     run: () => {
       return Promise.resolve({
-        close: () => void (0),
         output: () => Promise.resolve(new Uint8Array()),
+        stderrOutput: () => Promise.resolve(new Uint8Array()),
         status: () => {
           return Promise.resolve({
             success: true,
@@ -17,11 +18,5 @@ function mockExecDeps(): ExecDeps {
         },
       } as unknown as Deno.Process);
     },
-  };
-}
-
-function mockExecOptions(): ExecOptions {
-  return {
-    cmd: ["mock"],
   };
 }

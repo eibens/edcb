@@ -1,3 +1,9 @@
-import { cli } from "./cli.ts";
+import { createEdcb } from "./mod.ts";
 
-await cli();
+if (import.meta.main) {
+  const edcb = createEdcb();
+  await edcb.build({
+    // These directories should not be linted or formatted.
+    ignore: "deps,_todo",
+  });
+}

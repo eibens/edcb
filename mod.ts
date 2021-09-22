@@ -1,4 +1,11 @@
-export * from "./cli.ts";
-export * from "./version.ts";
-export * from "./factory.ts";
-export * from "./loggers.ts";
+import { Edcb } from "./utils/edcb.ts";
+import { withLogger } from "./utils/middleware/with_logger.ts";
+import { createLogger } from "./utils/logger.ts";
+
+export function createEdcb(): Edcb {
+  const log = createLogger(console.log, {
+    ignoredTasks: ["check", "run"],
+  });
+  const Logger = withLogger(log);
+  return Logger(new Edcb());
+}

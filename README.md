@@ -1,8 +1,8 @@
 # [edcb]
 
-[edcb] is a tool for building a [Deno] project locally and in a CI environment.
-It has support for formatting, linting, testing, code coverage, bundling, and
-more, and it can be used via command line or TypeScript import.
+[edcb] is a build tool and task runner for Deno. It has support for formatting,
+linting, testing, code coverage, bundling, and more, and it can be used via
+command line or TypeScript import.
 
 [![License][license-shield]](LICENSE)
 [![Deno module][deno-land-shield]][deno-land]
@@ -54,105 +54,29 @@ export CI=true
 edcb
 ```
 
-The `init` command generates boilerplate files.
-
-- [dev.ts](dev.ts) builds the repository. Run it with `deno run -A dev.ts`.
-- [.github/workflows/ci.yml](.github/workflows/ci.yml) defines a CI workflow for
-  GitHub Actions.
-
-```sh
-# Generates missing files.
-edcb init
-
-# Generates and overwrites files.
-edcb init --force
-
-# Use a specific version of edcb in the dev.ts file.
-edcb init --version=1.2.3
-```
-
 # Configuration
 
-[edcb] can be configured by creating a TypeScript module named `dev.ts`. It
-should import [edcb] and call the `cli` function defined in [cli.ts](cli.ts)
-with custom options. For example, one can specify the `check.ignore` option,
-which will then be used if the `--ignore` option was not provided:
+[edcb] can be configured with TypeScript. See the [dev.ts](dev.ts) module for an
+example. Import the `createEdcb` function and call one of its methods with
+custom options. For example, one can specify the `ignore` option, which will
+then be used if the `--ignore` option was not provided:
 
 ```ts
 // NOTE: Change this URL to a specific version of edcb.
-import { cli } from "https://deno.land/x/edcb/cli.ts";
+import { createEdcb } from "https://deno.land/x/edcb/mod.ts";
 
 await cli({
   check: {
-    ignore: "docs",
+    ignore: "deps,docs",
   },
 });
 ```
 
-When `edcb` is run in a folder with a `dev.ts` file, it will pass the arguments
-to `deno run -A dev.ts` instead. This prevents a developer from accidentally
-building a project with a local [edcb] version that differs from the version
-defined in `dev.ts`. The GitHub Actions workflow file also runs `dev.ts` to
-avoid this problem.
-
-# Actions
-
-Actions implement the particular tasks that can be performed by [edcb]. Each
-action is defined through a _builder_ function, which takes a set of
-dependencies and returns an async action function. This separation of
-dependencies and options allows for loose coupling, testing with mocks, and the
-use of hooks to monitor or change action behavior. There are native actions
-without dependencies, such as `Deno.writeFile`, and
-[composed actions](actions/mod.ts) that depend on other actions, such as
-`check`, which uses `fmt`, `lint`, `codecov`, and others. Extending [edcb] with
-custom actions is currently not possible.
-
-# Hooks
-
-Hooks are a way of overriding [edcb]'s behavior. A hook is a function that
-receives a function and returns a function of the same type. For example, one
-could build a hook for the `write` action that prints the file size to the
-console like this:
-
-```ts
-import { cli } from "https://deno.land/x/edcb/mod.ts";
-
-await cli({
-  hooks: {
-    write: (write) => {
-      return (file, data) => {
-        console.log(`Writing ${data.length} bytes.`);
-        return await write(file, data);
-      };
-    },
-  },
-});
-```
-
-Per default, [edcb] uses the hooks defined in [loggers.ts](loggers.ts). When the
-`hooks` options is provided, the default hooks will be overridden. The `chain`
-function can be used to combine multiple hooks. In this example, the `write`
-action will throw if the file would be bigger than one megabyte. The error will
-then be handled by `loggers`:
-
-```ts
-import { cli, Hooks, loggers } from "https://deno.land/x/edcb/mod.ts";
-
-const customHooks: Hooks = {
-  write: (write) => {
-    return (file, data) => {
-      if (data.length > 1_000_000) {
-        throw new Error("file is too big");
-      }
-      return await write(file, data);
-    };
-  },
-};
-
-await cli({
-  hooks: chain(customHooks, loggers),
-});
-```
+**TODO(not implemented):** When `edcb` is run in a folder with a `dev.ts` file,
+it will pass the arguments to `deno run -A dev.ts` instead. This prevents a
+developer from accidentally building a project with a local [edcb] version that
+differs from the version defined in `dev.ts`. The GitHub Actions workflow file
+also runs `dev.ts` to avoid this problem.
 
 [edcb]: #
 [Deno]: https://deno.land
