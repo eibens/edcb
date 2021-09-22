@@ -46,14 +46,6 @@ The `--ci` flag changes the behavior as follows:
 edcb --ci
 ```
 
-Alternatively, one can set the `CI` environment variable to `true` (which is
-done automatically by [GitHub Actions]).
-
-```sh
-export CI=true
-edcb
-```
-
 # Configuration
 
 [edcb] can be configured with TypeScript. See the [dev.ts](dev.ts) module for an
