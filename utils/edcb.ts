@@ -127,8 +127,8 @@ export class Edcb {
     return Deno.lstat(path);
   }
 
-  mkdir(path: string | URL) {
-    return Deno.mkdir(path);
+  mkdir(path: string | URL, options?: Deno.MkdirOptions) {
+    return Deno.mkdir(path, options);
   }
 
   makeTempDir() {
