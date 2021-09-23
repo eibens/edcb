@@ -35,7 +35,7 @@ export async function codecov(options: CodecovOptions): Promise<void> {
 
   // Upload coverage file.
   const scriptResult = await options.exec({
-    cmd: [options.scriptFile, "-f", options.lcovFile],
+    cmd: [options.scriptFile, "-f", options.lcovFile, "-Z"],
   });
   if (!scriptResult.success) {
     throw new Error(
