@@ -67,12 +67,15 @@ then be used if the `--ignore` option was not provided:
 
 ```ts
 // NOTE: Change this URL to a specific version of edcb.
-import { createEdcb } from "https://deno.land/x/edcb/mod.ts";
+import { createEdcb } from "./mod.ts";
 
-await cli({
-  check: {
-    ignore: "deps,docs",
-  },
+// Create an instance.
+const edcb = createEdcb();
+
+// Run the build action.
+await edcb.build({
+  // Specify options.
+  ignore: "deps",
 });
 ```
 
