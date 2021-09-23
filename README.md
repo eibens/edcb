@@ -11,6 +11,8 @@ tag][github-shield]][github] [![Build][build-shield]][build]
 [![Code
 coverage][coverage-shield]][coverage]
 
+![edcb in action](docs/video.gif)
+
 # CLI
 
 The [edcb] CLI can be installed with [Deno].
