@@ -127,7 +127,7 @@ export function createLogger(options: LoggerOptions = {}): Logger {
         const lines = text.split("\n");
         if (text) {
           log(tree.open(l, fmtMsg`${name}`));
-          if (options.debug) {
+          if (options.debug || !result.success) {
             lines.forEach((line) => log(tree.line(line)));
           } else {
             const noun = lines.length === 1 ? "line" : "lines";
