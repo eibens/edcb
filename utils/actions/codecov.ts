@@ -15,7 +15,7 @@ export type CodecovOptions = {
 
 export async function codecov(options: CodecovOptions): Promise<void> {
   // Download codecov script.
-  const scriptBash = await (await fetch(options.scriptUrl))
+  const scriptBash = await (await options.fetch(options.scriptUrl))
     .arrayBuffer();
   await options.write({
     force: true,
