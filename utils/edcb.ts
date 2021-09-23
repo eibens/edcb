@@ -18,15 +18,23 @@ export class Edcb {
     return build({
       ...options,
       args: Deno.args,
-      check: this.check.bind(this),
       makeTempDir: this.makeTempDir.bind(this),
+      check: (options) =>
+        check({
+          ...options,
+          codecov: this.codecov.bind(this),
+          coverage: this.coverage.bind(this),
+          fmt: this.fmt.bind(this),
+          lcov: this.lcov.bind(this),
+          lint: this.lint.bind(this),
+        }),
     });
   }
 
   exec(options: Deno.RunOptions) {
     return exec({
       ...options,
-      run: this.run.bind(this),
+      run: (options) => Promise.resolve(Deno.run(options)),
     });
   }
 
@@ -95,21 +103,6 @@ export class Edcb {
     });
   }
 
-  check(options: {
-    ci: boolean;
-    ignore: string;
-    temp: string;
-  }) {
-    return check({
-      ...options,
-      codecov: this.codecov.bind(this),
-      coverage: this.coverage.bind(this),
-      fmt: this.fmt.bind(this),
-      lcov: this.lcov.bind(this),
-      lint: this.lint.bind(this),
-    });
-  }
-
   bundle(options: {
     src: string;
     out: string;
@@ -124,10 +117,6 @@ export class Edcb {
 
   fetch(input: string | URL, init?: RequestInit) {
     return globalThis.fetch(input, init);
-  }
-
-  run(options: Deno.RunOptions) {
-    return Promise.resolve(Deno.run(options));
   }
 
   writeFile(path: string | URL, data: Uint8Array) {

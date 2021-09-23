@@ -2,10 +2,6 @@ import * as fmt from "../deps/colors.ts";
 import { version } from "../version.ts";
 import { withGetter } from "./middleware/with_getter.ts";
 
-export type LoggerOptions = {
-  ignoredTasks?: string[];
-};
-
 export type Logger = {
   header: () => void;
   footer: (error?: Error) => void;
@@ -27,13 +23,9 @@ export type Logger = {
 
 export function createLogger(
   log: (x: string) => void,
-  options: LoggerOptions = {},
 ): Logger {
   const tree = createTreeFormatter();
   const level = createLevelFormatters();
-  const {
-    ignoredTasks = [],
-  } = options;
 
   return {
     header: () => {
@@ -86,11 +78,9 @@ export function createLogger(
       log("");
     },
     onStart: (key) => {
-      if (ignoredTasks.includes(key)) return;
       log(tree.open("meta", level.meta`${fmtName(key)}`));
     },
     onFinish: (key, duration) => {
-      if (ignoredTasks.includes(key)) return;
       log(
         tree.close(
           level.meta`${fmtName(key)} finished in ${fmtTime(duration)}`,
