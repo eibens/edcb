@@ -26,6 +26,9 @@ export function withLogger(log: Logger): (edcb: Edcb) => Edcb {
     write: withRunner({
       value: log.onWriteValue,
     }),
+    writeFile: withRunner({
+      value: log.onWriteFileValue,
+    }),
   });
 
   const TaskLogger = withGetter<Edcb>((key) => {

@@ -17,7 +17,16 @@ export type Logger = {
   onMkdirValue: (value: void, dir: string | URL) => void;
   onFetchInput: (url: string | URL, init?: RequestInit) => void;
   onFetchValue: (response: Response, url: string | URL) => void;
-  onWriteValue: () => void;
+  onWriteFileValue: (
+    output: void,
+    file: string | URL,
+    data: Uint8Array,
+  ) => void;
+  onWriteValue: (success: boolean, options: {
+    file: string;
+    data: string | Uint8Array;
+    force: boolean;
+  }) => void;
   onExecInput: (options: Deno.RunOptions) => void;
   onExecValue: (result: {
     success: boolean;
@@ -165,7 +174,21 @@ export function createLogger(options: LoggerOptions = {}): Logger {
         level.info`Created temporary directory ${fmtUrl(path)}.`,
       ));
     },
-    onWriteValue: () => {
+    onWriteValue: (success, options) => {
+      if (!success) {
+        log(
+          tree.item(
+            level.warn`skipped writing existing file ${fmtUrl(options.file)}`,
+          ),
+        );
+      }
+    },
+    onWriteFileValue: (_, file, data) => {
+      log(
+        tree.item(
+          level.info`wrote ${fmtBytes(data.length)} to file ${fmtUrl(file)}`,
+        ),
+      );
     },
   };
 }
