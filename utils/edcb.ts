@@ -46,7 +46,7 @@ export class Edcb {
     return write({
       ...options,
       writeFile: this.writeFile.bind(this),
-      lstat: this.lstat.bind(this),
+      lstat: Deno.lstat,
       mkdir: this.mkdir.bind(this),
     });
   }
@@ -121,10 +121,6 @@ export class Edcb {
 
   writeFile(path: string | URL, data: Uint8Array) {
     return Deno.writeFile(path, data);
-  }
-
-  lstat(path: string | URL) {
-    return Deno.lstat(path);
   }
 
   mkdir(path: string | URL, options?: Deno.MkdirOptions) {
