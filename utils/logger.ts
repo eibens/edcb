@@ -45,14 +45,14 @@ export function createLogger(
         `\n\n${logo}`,
         tree.open("debug", level.debug`${"edcb"}`),
         tree.line(""),
-        item`description: ${"A build tool and task runner for Deno."}`,
+        item`arguments:   ${fallback(Deno.args.join(""), "none")}`,
         item`version:     ${fallback(version.tag, "unknown")}`,
+        item`timestamp:   ${new Date().toISOString()}`,
+        item`description: ${"A build tool and task runner for Deno."}`,
         item`website:     ${fmtUrl("https://github.com/eibens/edcb")}`,
         item
           `author:      ${"Lukas Eibensteiner"} <${"l.eibensteiner@gmail.com"}>`,
         item`license:     ${"MIT"}`,
-        item`timestamp:   ${new Date().toISOString()}`,
-        item`arguments:   ${fallback(Deno.args.join(""), "none")}`,
         tree.line(""),
         tree.close(level.debug`happy coding!`),
       ];
