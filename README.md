@@ -82,12 +82,6 @@ await edcb.build({
 });
 ```
 
-**TODO(not implemented):** When `edcb` is run in a folder with a `dev.ts` file,
-it will pass the arguments to `deno run -A dev.ts` instead. This prevents a
-developer from accidentally building a project with a local [edcb] version that
-differs from the version defined in `dev.ts`. The GitHub Actions workflow file
-also runs `dev.ts` to avoid this problem.
-
 [edcb]: #
 [Deno]: https://deno.land
 [GitHub Actions]: https://github.com/features/actions
