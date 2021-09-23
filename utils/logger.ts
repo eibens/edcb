@@ -171,7 +171,7 @@ export function createLogger(options: LoggerOptions = {}): Logger {
     },
     onMkdirValue: (_, path) => {
       log(tree.item(
-        level.info`Created temporary directory ${fmtUrl(path)}.`,
+        level.info`Created directory ${fmtUrl(path)}.`,
       ));
     },
     onWriteValue: (success, options) => {
