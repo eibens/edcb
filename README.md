@@ -43,8 +43,10 @@ edcb --ci
 
 ## `--debug`
 
-The `--debug` flag can be used to display sub-process output. Per default, the output is only logged if the process failed. For example, a developer may use the flag to see
-the full code coverage report in order to write tests for the missing lines.
+The `--debug` flag can be used to display sub-process output. Per default, the
+output is only logged if the process failed. For example, a developer may use
+the flag to see the full code coverage report in order to write tests for the
+missing lines.
 
 ```sh
 edcb --debug
