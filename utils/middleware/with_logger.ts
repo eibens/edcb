@@ -46,7 +46,7 @@ export function withLogger(log: Logger): (edcb: Edcb) => Edcb {
     withRunner({
       error: (error, ..._): Promise<void> => {
         log.onError(error);
-        throw new Error(`failed because action "${key}" failed.`);
+        throw error;
       },
     })
   );

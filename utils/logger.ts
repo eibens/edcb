@@ -31,6 +31,7 @@ export function createLogger(options: LoggerOptions = {}): Logger {
 
   const tree = createTreeFormatter();
   const level = createLevelFormatters();
+  const errors: Error[] = [];
 
   return {
     header: () => {
@@ -96,6 +97,10 @@ export function createLogger(options: LoggerOptions = {}): Logger {
       );
     },
     onError: (error: Error) => {
+      // Each error is only logged once when it is first thrown.
+      if (errors.includes(error)) return;
+      errors.push(error);
+
       const text = String(error);
       const lines = String(error).trim().split("\n");
       log(tree.open(
