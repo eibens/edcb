@@ -23,17 +23,10 @@ After installation, building a project is as simple as running [edcb] in the
 project root.
 
 ```sh
-# Formats, lints, and runs tests in the current directory.
 edcb
 ```
 
-The `--ignore` option can be used to ignore files and directories. It has the
-same format as the `--ignore` option of `deno fmt` and `deno lint`.
-
-```sh
-# Prevent formatting or linting of files in the `docs` directory.
-edcb --ignore=docs
-```
+## `--ci`
 
 The `--ci` flag changes the behavior as follows:
 
@@ -44,6 +37,25 @@ The `--ci` flag changes the behavior as follows:
 
 ```sh
 edcb --ci
+```
+
+## `--debug`
+
+The `--debug` flag can be used to display sub-process output. Per default, all
+process output will be hidden. For example, a developer may use the flag to see
+the full code coverage report in order to write tests for the missing lines.
+
+```sh
+edcb --debug
+```
+
+## `--ignore`
+
+The `--ignore` option can be used to ignore files and directories. It has the
+same format as the `--ignore` option of `deno fmt` and `deno lint`.
+
+```sh
+edcb --ignore=deps,docs
 ```
 
 # Configuration

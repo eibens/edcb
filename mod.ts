@@ -3,7 +3,9 @@ import { withLogger } from "./utils/middleware/with_logger.ts";
 import { createLogger } from "./utils/logger.ts";
 
 export function createEdcb(): Edcb {
-  const log = createLogger(console.log);
+  const log = createLogger({
+    debug: Deno.args.includes("--debug"),
+  });
   const Logger = withLogger(log);
   return Logger(new Edcb());
 }

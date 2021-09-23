@@ -2,6 +2,11 @@ import * as fmt from "../deps/colors.ts";
 import { version } from "../version.ts";
 import { withGetter } from "./middleware/with_getter.ts";
 
+export type LoggerOptions = {
+  log?: (str: string) => void;
+  debug?: boolean;
+};
+
 export type Logger = {
   header: () => void;
   footer: (error?: Error) => void;
@@ -21,29 +26,32 @@ export type Logger = {
   }, options: Deno.RunOptions) => void;
 };
 
-export function createLogger(
-  log: (x: string) => void,
-): Logger {
+export function createLogger(options: LoggerOptions = {}): Logger {
+  const { log = console.log } = options;
+
   const tree = createTreeFormatter();
   const level = createLevelFormatters();
 
   return {
     header: () => {
-      const logo = randomColors(
-        ASCII_LOGO,
-        () => randomInt(128, 256),
-        () => randomInt(64, 128),
-        () => randomInt(128, 256),
+      log(
+        "\n\n" + randomColors(
+          ASCII_LOGO,
+          () => randomInt(128, 256),
+          () => randomInt(64, 128),
+          () => randomInt(128, 256),
+        ),
       );
+
+      const l = "debug";
 
       const fallback = (x: unknown, fallback: string) =>
         x ? String(x) : fmt.italic(fallback);
 
-      const item = (...args: TemplateArgs) => tree.item(level.debug(...args));
+      const item = (...args: TemplateArgs) => tree.item(level[l](...args));
 
       const lines = [
-        `\n\n${logo}`,
-        tree.open("debug", level.debug`${"edcb"}`),
+        tree.open(l, level[l]`${"edcb"}`),
         tree.line(""),
         item`arguments:   ${fallback(Deno.args.join(""), "none")}`,
         item`version:     ${fallback(version.tag, "unknown")}`,
@@ -54,7 +62,7 @@ export function createLogger(
           `author:      ${"Lukas Eibensteiner"} <${"l.eibensteiner@gmail.com"}>`,
         item`license:     ${"MIT"}`,
         tree.line(""),
-        tree.close(level.debug`happy coding!`),
+        tree.close(level[l]`happy coding!`),
       ];
       lines.map((line) => log(line));
     },
@@ -114,7 +122,17 @@ export function createLogger(
         const lines = text.split("\n");
         if (text) {
           log(tree.open(l, fmtMsg`${name}`));
-          lines.forEach((line) => log(tree.line(line)));
+          if (options.debug) {
+            lines.forEach((line) => log(tree.line(line)));
+          } else {
+            const noun = lines.length === 1 ? "line" : "lines";
+            log(
+              tree.item(
+                level.info`${lines.length} ${noun} hidden` +
+                  level.debug` (use ${"--debug"} flag for complete output)`,
+              ),
+            );
+          }
           log(tree.close(fmtMsg`${name} received ${fmtBytes(b.length)}`));
         }
       }

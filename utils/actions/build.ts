@@ -16,9 +16,10 @@ export async function build(options: BuildOptions): Promise<void> {
   const temp = options.temp || await options.makeTempDir();
   const ignore = options.ignore || "";
   return options.check(parseFlags(Deno.args, {
-    boolean: ["ci"],
+    boolean: ["ci", "debug"],
     string: ["ignore", "temp"],
     default: {
+      debug: false,
       ci: Boolean(options.ci),
       ignore,
       temp,
