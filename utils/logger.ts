@@ -153,25 +153,25 @@ export function createLogger(options: LoggerOptions = {}): Logger {
     },
     onFetchInput: (url, init) => {
       log(tree.item(
-        level.io`Sending ${init?.method || "GET"} request to ${fmtUrl(url)}.`,
+        level.info`${init?.method || "GET"} request to ${fmtUrl(url)}`,
       ));
     },
     onFetchValue: (response, url) => {
       log(tree.item(
         level.success
-          `HTTP ${response.status} "${response.statusText}" received from ${
+          `${response.status} "${response.statusText}" received from ${
             fmtUrl(url)
-          }.`,
+          }`,
       ));
     },
     onMakeTempDirValue: (path) => {
       log(tree.item(
-        level.info`Created temporary directory ${fmtUrl(path)}.`,
+        level.success`created temporary directory ${fmtUrl(path)}`,
       ));
     },
     onMkdirValue: (_, path) => {
       log(tree.item(
-        level.info`Created directory ${fmtUrl(path)}.`,
+        level.success`created directory ${fmtUrl(path)}`,
       ));
     },
     onWriteValue: (success, options) => {
@@ -186,7 +186,7 @@ export function createLogger(options: LoggerOptions = {}): Logger {
     onWriteFileValue: (_, file, data) => {
       log(
         tree.item(
-          level.info`wrote ${fmtBytes(data.length)} to file ${fmtUrl(file)}`,
+          level.success`wrote ${fmtBytes(data.length)} to file ${fmtUrl(file)}`,
         ),
       );
     },
