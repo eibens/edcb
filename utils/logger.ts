@@ -123,7 +123,7 @@ export function createLogger(options: LoggerOptions = {}): Logger {
       function print(b: Uint8Array, name: string) {
         const l = result.success ? "debug" : "error";
         const fmtMsg = level[l];
-        const text = new TextDecoder().decode(b).trim();
+        const text = new TextDecoder().decode(b).trimEnd();
         const lines = text.split("\n");
         if (text) {
           log(tree.open(l, fmtMsg`${name}`));
