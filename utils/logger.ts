@@ -37,7 +37,7 @@ export function createLogger(options: LoggerOptions = {}): Logger {
       log(
         "\n\n" + randomColors(
           ASCII_LOGO,
-          () => randomInt(128, 256),
+          () => randomInt(64, 128),
           () => randomInt(64, 128),
           () => randomInt(128, 256),
         ),
