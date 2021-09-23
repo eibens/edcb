@@ -42,7 +42,7 @@ export function withLogger(log: Logger): (edcb: Edcb) => Edcb {
     });
   });
 
-  const ErrorLogger = withGetter<Edcb>((key) =>
+  const ErrorLogger = withGetter<Edcb>(() =>
     withRunner({
       error: (error, ..._): Promise<void> => {
         log.onError(error);
