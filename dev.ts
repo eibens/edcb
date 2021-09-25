@@ -11,7 +11,7 @@ if (import.meta.main) {
       webRoot: "docs",
       bundles: [{
         source: "docs/example_script.ts",
-        target: "docs/example_bundle.js",
+        target: "example_script.js",
       }],
     },
   });
