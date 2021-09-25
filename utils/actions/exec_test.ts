@@ -11,6 +11,7 @@ function mockExecOptions(): ExecOptions {
       return Promise.resolve({
         output: () => Promise.resolve(new Uint8Array()),
         stderrOutput: () => Promise.resolve(new Uint8Array()),
+        close: () => {},
         status: () => {
           return Promise.resolve({
             success: true,

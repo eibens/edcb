@@ -14,8 +14,11 @@ export async function exec(options: ExecOptions): Promise<ExecResult> {
     stdout: "piped",
     stderr: "piped",
   });
-  const { success } = await p.status();
-  const stdout = await p.output();
-  const stderr = await p.stderrOutput();
+  const [{ success }, stdout, stderr] = await Promise.all([
+    p.status(),
+    p.output(),
+    p.stderrOutput(),
+  ]);
+  p.close();
   return { success, stdout, stderr };
 }
