@@ -1,8 +1,7 @@
-import { createEdcb } from "./mod.ts";
+import { check } from "./mod.ts";
 
 if (import.meta.main) {
-  const edcb = createEdcb();
-  await edcb.build({
+  await check({
     // These directories should not be linted or formatted.
     ignore: "deps,docs",
   });
