@@ -63,20 +63,17 @@ edcb --ignore=deps,docs
 
 # Configuration
 
-[edcb] can be configured with TypeScript. See the [dev.ts](dev.ts) module for an
-example. Import the `createEdcb` function and call one of its methods with
-custom options. For example, one can specify the `ignore` option, which will
-then be used if the `--ignore` option was not provided:
+[edcb] can be configured with TypeScript. The [mod.ts](mod.ts) module exports
+the available task functions. The specified options will serve as defaults. For
+example, one can specify the `ignore` option, which will then be used if the
+`--ignore` flag was not provided.
 
 ```ts
 // NOTE: Change this URL to a specific version of edcb.
-import { createEdcb } from "./mod.ts";
+import { check } from "./mod.ts";
 
-// Create an instance.
-const edcb = createEdcb();
-
-// Run the build action.
-await edcb.build({
+// Run the check action.
+await check({
   // Specify options.
   ignore: "deps",
 });
