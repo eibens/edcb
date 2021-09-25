@@ -1,5 +1,5 @@
-import { createEdcb } from "./mod.ts";
+import { check } from "./mod.ts";
 
 if (import.meta.main) {
-  createEdcb().build();
+  await check();
 }
