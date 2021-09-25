@@ -1,7 +1,8 @@
 import { dirname } from "../../deps/path.ts";
 
 export type BundleOptions = {
-  mkdir: (typeof Deno)["mkdir"];
+  mkdir: typeof Deno.mkdir;
+  lstat: typeof Deno.lstat;
   exec: (options: Deno.RunOptions) => Promise<{ success: boolean }>;
   source: string;
   target: string;
@@ -9,7 +10,16 @@ export type BundleOptions = {
 };
 
 export async function bundle(options: BundleOptions): Promise<void> {
-  await options.mkdir(dirname(options.source), { recursive: true });
+  // Create directory if it does not exist.
+  const dir = dirname(options.target);
+  try {
+    await options.lstat(dir);
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) {
+      await options.mkdir(dir);
+    }
+  }
+
   const { success } = await options.exec({
     cmd: [
       "deno",

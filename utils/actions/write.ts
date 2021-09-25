@@ -29,8 +29,17 @@ export async function write(options: WriteOptions): Promise<boolean> {
     data = new TextEncoder().encode(options.data);
   }
 
+  // Create directory if it does not exist.
+  const dir = dirname(options.file);
+  try {
+    await options.lstat(dir);
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) {
+      await options.mkdir(dir);
+    }
+  }
+
   // Write file.
-  await options.mkdir(dirname(options.file), { recursive: true });
   await options.writeFile(options.file, data);
   return true;
 }
