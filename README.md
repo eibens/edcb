@@ -13,24 +13,88 @@ coverage][coverage-shield]][coverage]
 
 ![edcb in action](docs/video.gif)
 
+# Configuration
+
+[edcb] can be be invoked via TypeScript. The [cli.ts](cli.ts) module exports the
+[edcb CLI](#cli). The specified options will serve as defaults. For example, one
+can specify the `ignore` option for the `check` command, which will then be used
+if the `--ignore` flag was not provided on the command-line. [edcb] can be
+configured in any TypeScript module. The current convention is using a module
+with the name [dev.ts](dev.ts).
+
+```ts
+// file: dev.ts
+import { cli } from "./cli.ts";
+
+await cli({
+  check: {
+    ignore: "deps",
+  },
+  serve: {
+    port: 1234,
+    bundles: [{
+      source: "index.ts",
+      target: "index.js",
+    }],
+  },
+});
+```
+
+Commands can be used individually by importing them from [mod.ts](mod.ts).
+
+```ts
+import { check } from "./mod.ts";
+
+await check({
+  ignore: "deps",
+});
+```
+
 # CLI
 
 The [edcb] CLI can be installed with [Deno].
 
 ```sh
-deno install -f -A https://deno.land/x/edcb/cli.ts
+deno install -f -A --unstable https://deno.land/x/edcb/cli.ts
 ```
 
-After installation, building a project is as simple as running [edcb] in the
-project root.
+After installation, one may run commands in the project directory.
 
 ```sh
-edcb
+edcb <command>
 ```
 
-## `--ci`
+Supported commands:
 
-The `--ci` flag changes the behavior as follows:
+- [check](#check)
+- [serve](#serve)
+
+## Common Flags
+
+These are flags that are available for all commands.
+
+### `--debug`
+
+Displays sub-process output. Per default, the output is only logged if the
+process failed. For example, a developer may use the flag to see the full code
+coverage report in order to write tests for the missing lines.
+
+```sh
+edcb <command> --debug
+```
+
+## `check`
+
+Formats, lints, and tests the project. Code coverage will be displayed and can
+optionally be uploaded to [codecov.io].
+
+```sh
+edcb check
+```
+
+### `--ci`
+
+Changes the behavior as follows:
 
 1. Runs the [Deno] formatter with the `--check` flag.
 2. Generates a test coverage file.
@@ -38,55 +102,77 @@ The `--ci` flag changes the behavior as follows:
    local systems.
 
 ```sh
-edcb --ci
+edcb check --ci
 ```
 
-## `--debug`
+### `--ignore`
 
-The `--debug` flag can be used to display sub-process output. Per default, the
-output is only logged if the process failed. For example, a developer may use
-the flag to see the full code coverage report in order to write tests for the
-missing lines.
+Ignores files and directories during formatting and linting. It has the same
+format as the `--ignore` option of `deno fmt` and `deno lint`.
 
 ```sh
-edcb --debug
+edcb check --ignore=deps,docs
 ```
 
-## `--ignore`
+### `--temp`
 
-The `--ignore` option can be used to ignore files and directories. It has the
-same format as the `--ignore` option of `deno fmt` and `deno lint`.
+Provides the directory that is used to store temporary files. If none is
+specified, a directory will be created in the standard location for temporary
+files (e.g. `/tmp`).
 
 ```sh
-edcb --ignore=deps,docs
+edcb check --temp=some/path
 ```
 
-## `--temp`
+## `serve`
 
-The `--temp` option can be used to provide the directory that is used to store
-temporary files. If none is specified, a directory will be created in the
-standard location for temporary files (e.g. `/tmp`).
+Starts an HTTP server with an optional WebSocket server that broadcasts file
+system changes. Note that the `serve` command would usually be used in
+conjunction with a [edcb configuration file](#configuration). The reason is that
+the `bundles` option cannot be specified via CLI.
 
 ```sh
-edcb --temp some/path
+edcb serve
 ```
 
-# Configuration
+### `--hostname`
 
-[edcb] can be configured with TypeScript. The [mod.ts](mod.ts) module exports
-the available task functions. The specified options will serve as defaults. For
-example, one can specify the `ignore` option, which will then be used if the
-`--ignore` flag was not provided.
+Specify the hostname used for the HTTP listener.
 
-```ts
-// NOTE: Change this URL to a specific version of edcb.
-import { check } from "./mod.ts";
+```sh
+edcb serve --port=8080
+```
 
-// Run the check action.
-await check({
-  // Specify options.
-  ignore: "deps",
-});
+### `--port`
+
+Specify the port number used for the HTTP listener.
+
+```sh
+edcb serve --hostname=localhost
+```
+
+### `--reload`
+
+Enable file change broadcasts via WebSocket.
+
+```sh
+edcb serve --reload
+```
+
+### `--root`
+
+Specify the root path for the file watcher.
+
+```sh
+edcb serve --root=.
+```
+
+### `--web-root`
+
+Specify the public directory from which static files are served.
+
+```sh
+edcb serve --web-root=docs
 ```
 
 [edcb]: #

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Test Page for edcb</title>
+  <script defer type="module" src="example_script.js"></script>
+  <script>
+    // Reload the website when a WebSocket message is received.
+    new WebSocket("ws://localhost:8080")
+      .addEventListener("message", () => window.location.reload());
+  </script>
+</head>
+
+<body>
+  <h1>Text Page</h1>
+  <p>This page is for testing the web server and automatic reloading.</p>
+</body>
+
+</html>
