@@ -61,6 +61,16 @@ same format as the `--ignore` option of `deno fmt` and `deno lint`.
 edcb --ignore=deps,docs
 ```
 
+## `--temp`
+
+The `--temp` option can be used to provide the directory that is used to store
+temporary files. If none is specified, a directory will be created in the
+standard location for temporary files (e.g. `/tmp`).
+
+```sh
+edcb --temp some/path
+```
+
 # Configuration
 
 [edcb] can be configured with TypeScript. The [mod.ts](mod.ts) module exports
