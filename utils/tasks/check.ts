@@ -26,7 +26,7 @@ export type CheckOptions = {
   temp: string;
 };
 
-export function check(options: Partial<CheckOptions & { args: string[] }>) {
+export function check(options: Partial<CheckOptions & { args: string[] }> = {}) {
   const flags = parseFlags(options.args || Deno.args, {
     boolean: ["ci", "debug"],
     string: ["ignore", "temp"],
