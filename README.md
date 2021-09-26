@@ -18,9 +18,12 @@ coverage][coverage-shield]][coverage]
 [edcb] can be be invoked via TypeScript. The [cli.ts](cli.ts) module exports the
 [edcb CLI](#cli). The specified options will serve as defaults. For example, one
 can specify the `ignore` option for the `check` command, which will then be used
-if the `--ignore` flag was not provided on the command-line. [edcb] can be
-configured in any TypeScript module. The current convention is using a module
-with the name [dev.ts](dev.ts).
+if the `--ignore` flag was not provided on the command-line.
+
+[edcb] will look for the [dev.ts](dev.ts) module in the working directory and
+run it if it exists. This allows one to lock a particular [edcb] version to a
+project. The `edcb` CLI then essentially becomes an alias for
+`deno run -A --unstable dev.ts [args]`.
 
 ```ts
 // file: dev.ts

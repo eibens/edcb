@@ -3,7 +3,7 @@ import { serve } from "./mod.ts";
 
 if (import.meta.main) {
   const devScript = "dev.ts";
-  if (fileExists(devScript)) {
+  if (await fileExists(devScript)) {
     // When a dev.ts script exists, run it.
     // This prevents version edcb version mismatch.
     await runScript(devScript, Deno.args);
