@@ -1,5 +1,7 @@
 import { parseFlags } from "../flags.ts";
 import { withMap } from "../middleware/with_map.ts";
+import { createBundler } from "../bundler.ts";
+import { createBroadcast } from "../broadcast.ts";
 // actions
 import { bundle } from "../actions/bundle.ts";
 import { exec } from "../actions/exec.ts";
@@ -14,7 +16,6 @@ import { withMkdirLogger } from "../loggers/actions/mkdir.ts";
 import { withServeLogger } from "../loggers/actions/serve.ts";
 import { withReadFileLogger } from "../loggers/actions/read_file.ts";
 import { withRequestLogger } from "../loggers/actions/request.ts";
-import { join, normalize, resolve } from "../../deps/path.ts";
 
 export type ServeOptions = {
   debug: boolean;
@@ -29,14 +30,6 @@ export type ServeOptions = {
     tsconfig?: string;
   }[];
 };
-
-type BundleOptions = {
-  tsconfig?: string;
-  source: string;
-  target: string;
-};
-
-type BundleAction = (options: BundleOptions) => Promise<void>;
 
 function parseOptions(
   options: Partial<ServeOptions & { args: string[] }>,
@@ -108,7 +101,7 @@ class ServeTask {
     const listener = listen({
       port: options.port,
       hostname: options.hostname,
-      onSocket: broadcast.addSocket,
+      onSocket: broadcast.add,
       onRequest: (request) => {
         return this.onRequest({
           request,
@@ -160,78 +153,4 @@ class ServeTask {
   mkdir(path: string | URL, options?: Deno.MkdirOptions) {
     return Deno.mkdir(path, options);
   }
-}
-
-function createBroadcast() {
-  const sockets = new Set<WebSocket>();
-  return {
-    send: (message = "") => {
-      sockets.forEach((socket) => socket.send(message));
-    },
-    addSocket: (socket: WebSocket) => {
-      socket.onopen = () => {
-        sockets.add(socket);
-        socket.onclose = () => {
-          sockets.delete(socket);
-        };
-      };
-    },
-  };
-}
-
-function createBundler(options: {
-  webRoot: string;
-  bundle: BundleAction;
-  bundles: BundleOptions[];
-}) {
-  const bundles = new Map<string, {
-    dirty: boolean;
-    source: string;
-    target: string;
-  }>();
-
-  // Map absolute bundle path to a dirty flag.
-  options.bundles.forEach((bundle) => {
-    bundles.set(keyFromTarget(bundle.target), {
-      dirty: true,
-      source: bundle.source,
-      target: normalize(join(options.webRoot, bundle.target)),
-    });
-  });
-
-  function normalizePath(path: string) {
-    return normalize(resolve(path));
-  }
-
-  function keyFromTarget(path: string) {
-    return normalizePath(join(options.webRoot, path));
-  }
-
-  function keyFromUrl(url: string) {
-    const { pathname } = new URL(url);
-    return keyFromTarget(pathname.substr(1)); // remove leading slash
-  }
-
-  return {
-    markDirty: (path: string) => {
-      // NOTE: Ignore changes on bundled files.
-      // Otherwise, bundled files would be marked dirty immediately.
-      if (bundles.has(normalizePath(path))) return;
-      bundles.forEach((bundle) => {
-        bundle.dirty = true;
-      });
-    },
-    updateBundle: async (url: string) => {
-      // Find bundle that matches the URL.
-      const bundle = bundles.get(keyFromUrl(url));
-      if (!bundle) return;
-
-      // Ignore bundles that are already up-to-date.
-      if (!bundle.dirty) return;
-      bundle.dirty = false;
-
-      // Bundle the file.
-      await options.bundle(bundle);
-    },
-  };
 }
