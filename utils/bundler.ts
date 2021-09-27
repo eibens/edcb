@@ -67,7 +67,11 @@ export function createBundler(options: BundlerOptions): Bundler {
       bundle.dirty = false;
 
       // Bundle the file.
-      await options.bundle(bundle);
+      try {
+        await options.bundle(bundle);
+      } catch (error) {
+        // NOTE: An invalid bundle should not shut down the server.
+      }
     },
   };
 }
