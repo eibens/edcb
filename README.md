@@ -127,6 +127,15 @@ files (e.g. `/tmp`).
 edcb check --temp=some/path
 ```
 
+### `--tests`
+
+Selects test files in a sub-directory. This option is limited to a single file
+pattern.
+
+```sh
+edcb check --tests=src/test/*
+```
+
 ## `serve`
 
 Starts an HTTP server with an optional WebSocket server that broadcasts file

@@ -24,6 +24,7 @@ export type CheckOptions = {
   debug: boolean;
   ignore: string;
   temp: string;
+  tests: string;
 };
 
 export function check(
@@ -31,12 +32,13 @@ export function check(
 ) {
   const flags = parseFlags(options.args || Deno.args, {
     boolean: ["ci", "debug"],
-    string: ["ignore", "temp"],
+    string: ["ignore", "temp", "tests"],
     default: {
       debug: Boolean(options.debug),
       ci: Boolean(options.ci),
       ignore: options.ignore || "",
       temp: options.temp || "",
+      tests: options.tests || "",
     },
   });
 
@@ -104,9 +106,11 @@ class CheckTask {
 
   coverage(options: {
     dir: string;
+    tests: string;
   }) {
     return coverage({
       ...options,
+      tests: options.tests,
       exec: this.exec.bind(this),
     });
   }

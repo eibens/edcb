@@ -1,12 +1,20 @@
 export type CoverageOptions = {
   exec: (options: Deno.RunOptions) => Promise<{ success: boolean }>;
   dir: string;
+  tests: string;
 };
 
 export async function coverage(options: CoverageOptions): Promise<void> {
   // Test
   const testResult = await options.exec({
-    cmd: ["deno", "test", "-A", "--unstable", "--coverage=" + options.dir],
+    cmd: [
+      "deno",
+      "test",
+      "-A",
+      "--unstable",
+      "--coverage=" + options.dir,
+      ...(options.tests ? [options.tests] : []),
+    ],
   });
 
   if (!testResult.success) {

@@ -10,6 +10,7 @@ export type CheckOptions = {
   }) => Promise<void>;
   coverage: (options: {
     dir: string;
+    tests: string;
   }) => Promise<void>;
   lcov: (options: {
     dir: string;
@@ -23,6 +24,7 @@ export type CheckOptions = {
   ignore: string;
   ci: boolean;
   temp: string;
+  tests: string;
 };
 
 export async function check(options: CheckOptions): Promise<void> {
@@ -42,6 +44,7 @@ export async function check(options: CheckOptions): Promise<void> {
 
   await options.coverage({
     dir: covDir,
+    tests: options.tests,
   });
 
   if (options.ci) {
