@@ -8,6 +8,7 @@ export type CodecovOptions = {
   write: (options: WriteOptions) => Promise<boolean>;
   exec: (options: Deno.RunOptions) => Promise<{ success: boolean }>;
   fetch: (url: string) => Promise<Response>;
+  token?: string;
   lcovFile: string;
   scriptUrl: string;
   scriptFile: string;
@@ -34,8 +35,9 @@ export async function codecov(options: CodecovOptions): Promise<void> {
   }
 
   // Upload coverage file.
+  const token = options.token ? ["t", options.token] : [];
   const scriptResult = await options.exec({
-    cmd: [options.scriptFile, "-f", options.lcovFile, "-Z"],
+    cmd: [options.scriptFile, "-f", options.lcovFile, "-Z", ...token],
   });
   if (!scriptResult.success) {
     throw new Error(

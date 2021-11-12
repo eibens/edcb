@@ -27,6 +27,7 @@ export type CheckOptions = {
   ignore: string;
   temp: string;
   tests: string;
+  codecov?: string;
 };
 
 function parseOptions(
@@ -44,6 +45,7 @@ function parseOptions(
     ignore: flags.ignore || options.ignore || "",
     temp: flags.temp || options.temp || "",
     tests: flags.tests || options.tests || "",
+    codecov: flags.codecov !== undefined ? flags.codecov : options.codecov,
   };
 }
 
@@ -92,7 +94,7 @@ class CheckTask {
       tests: options.tests,
     });
 
-    if (options.ci) {
+    if (options.codecov !== undefined) {
       const covFile = join(covDir, "coverage.lcov");
       const scriptFile = join(temp, "codecov.bash");
       const codecovUrl = "https://codecov.io/bash";
@@ -103,6 +105,7 @@ class CheckTask {
       });
 
       await this.codecov({
+        token: options.codecov,
         lcovFile: covFile,
         scriptFile: scriptFile,
         scriptUrl: codecovUrl,
@@ -134,6 +137,7 @@ class CheckTask {
     lcovFile: string;
     scriptFile: string;
     scriptUrl: string;
+    token?: string;
   }) {
     return codecov({
       ...options,
