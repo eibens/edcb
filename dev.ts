@@ -4,7 +4,7 @@ if (import.meta.main) {
   await cli({
     check: {
       // These directories should not be linted or formatted.
-      ignore: "deps,docs",
+      ignore: "docs",
     },
     serve: {
       reload: true,
