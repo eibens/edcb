@@ -1,5 +1,6 @@
 import { check, CheckOptions, ServeOptions } from "./mod.ts";
 import { serve } from "./mod.ts";
+import { home } from "./utils/tasks/home.ts";
 
 if (import.meta.main) {
   const devScript = "dev.ts";
@@ -23,10 +24,11 @@ export async function cli(options: Partial<CliOptions> = {}) {
     string,
     (options: { args: string[] }) => Promise<void>
   > = {
+    home: () => home(),
     serve: () => serve(options.serve),
     check: () => check(options.check),
   };
-  const command = commands[key] || commands.check;
+  const command = commands[key] || commands.home;
   return await command({ args });
 }
 

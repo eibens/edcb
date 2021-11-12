@@ -2,6 +2,7 @@ import { withRunner } from "../../middleware/with_runner.ts";
 import * as fmt from "../../fmt.ts";
 
 type ServeAction = (options: {
+  help: boolean;
   hostname: string;
   port: number;
   webRoot: string;

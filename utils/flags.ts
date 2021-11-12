@@ -3,6 +3,7 @@ import { parse } from "https://deno.land/std@0.103.0/flags/mod.ts";
 export type ParseFlagsOptions<B extends string, S extends string> = {
   string: S[];
   boolean: B[];
+  alias?: { [key: string]: string };
   default:
     & { [k in B]: boolean }
     & { [k in S]: string };

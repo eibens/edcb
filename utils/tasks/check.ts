@@ -1,4 +1,5 @@
 import { parseFlags } from "../flags.ts";
+import { check as help } from "../help.ts";
 import { withMap } from "../middleware/with_map.ts";
 // actions
 import { check as _check } from "../actions/check.ts";
@@ -20,6 +21,7 @@ import { withWriteFileLogger } from "../loggers/actions/write_file.ts";
 import { createTreeLogger } from "../tree_logger.ts";
 
 export type CheckOptions = {
+  help: boolean;
   ci: boolean;
   debug: boolean;
   ignore: string;
@@ -27,13 +29,15 @@ export type CheckOptions = {
   tests: string;
 };
 
-export function check(
+function parseOptions(
   options: Partial<CheckOptions & { args: string[] }> = {},
-) {
-  const flags = parseFlags(options.args || Deno.args, {
-    boolean: ["ci", "debug"],
+): CheckOptions {
+  return parseFlags(options.args || Deno.args, {
+    boolean: ["ci", "debug", "help"],
     string: ["ignore", "temp", "tests"],
+    alias: { help: "h" },
     default: {
+      help: false,
       debug: Boolean(options.debug),
       ci: Boolean(options.ci),
       ignore: options.ignore || "",
@@ -41,13 +45,24 @@ export function check(
       tests: options.tests || "",
     },
   });
+}
+
+export async function check(
+  options: Partial<CheckOptions & { args: string[] }> = {},
+) {
+  const opts = parseOptions(options);
+
+  if (opts.help) {
+    console.log(help);
+    return;
+  }
 
   const tree = createTreeLogger(console.log);
   const task = new CheckTask();
   const Logger = withLogger<CheckTask>(
     tree,
     withMap<CheckTask>({
-      exec: withExecLogger(tree, Boolean(flags.debug)),
+      exec: withExecLogger(tree, Boolean(opts.debug)),
       fetch: withFetchLogger(tree.item),
       makeTempDir: withMakeTempDirLogger(tree.item),
       mkdir: withMkdirLogger(tree.item),
@@ -55,7 +70,7 @@ export function check(
       writeFile: withWriteFileLogger(tree.item),
     }),
   );
-  return Logger(task).check(flags);
+  await Logger(task).check(opts);
 }
 
 class CheckTask {

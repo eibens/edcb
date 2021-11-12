@@ -24,7 +24,7 @@ export function time(ms: number) {
 }
 
 export function bytes(bytes: number) {
-  if (bytes > 1000) return unit((bytes / 1000), "kB", 3);
+  if (bytes > 1000) return unit(bytes / 1000, "kB", 3);
   return unit(bytes, "B");
 }
 

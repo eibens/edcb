@@ -1,4 +1,5 @@
 import { parseFlags } from "../flags.ts";
+import { serve as help } from "../help.ts";
 import { withMap } from "../middleware/with_map.ts";
 import { createBundler } from "../bundler.ts";
 import { createBroadcast } from "../broadcast.ts";
@@ -18,6 +19,7 @@ import { withReadFileLogger } from "../loggers/actions/read_file.ts";
 import { withRequestLogger } from "../loggers/actions/request.ts";
 
 export type ServeOptions = {
+  help: boolean;
   debug: boolean;
   port: number;
   hostname: string;
@@ -35,9 +37,11 @@ function parseOptions(
   options: Partial<ServeOptions & { args: string[] }>,
 ): ServeOptions {
   const flags = parseFlags(options.args || Deno.args, {
-    boolean: ["reload", "debug"],
+    boolean: ["reload", "debug", "help"],
     string: ["port", "hostname", "root", "web-root"],
+    alias: { help: "h" },
     default: {
+      help: false,
       debug: Boolean(options.debug),
       reload: Boolean(options.reload),
       port: options.port ? String(options.port) : "8080",
@@ -46,12 +50,14 @@ function parseOptions(
       "web-root": options.webRoot || "docs",
     },
   });
+
   const port = parseInt(flags.port);
   if (isNaN(port)) {
     throw new Error(`Value "${options.port}" is not a valid port number.`);
   }
   return {
     port,
+    help: flags.help,
     debug: flags.debug,
     hostname: flags.hostname,
     reload: flags.reload,
@@ -61,10 +67,16 @@ function parseOptions(
   };
 }
 
-export function serve(
+export async function serve(
   options: Partial<ServeOptions & { args: string[] }> = {},
 ) {
   const opts = parseOptions(options);
+
+  if (opts.help) {
+    console.log(help);
+    return;
+  }
+
   const tree = createTreeLogger(console.log);
   const task = new ServeTask();
   const Logger = withLogger<ServeTask>(
@@ -77,7 +89,7 @@ export function serve(
       onRequest: withRequestLogger(tree.item),
     }),
   );
-  return Logger(task).serve(opts);
+  await Logger(task).serve(opts);
 }
 
 class ServeTask {
