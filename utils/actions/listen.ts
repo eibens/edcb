@@ -23,10 +23,10 @@ export async function listen(options: ListenOptions) {
           // @ts-ignore unstable API
           const { socket, response } = Deno.upgradeWebSocket(request);
           options.onSocket(socket);
-          event.respondWith(response);
+          await event.respondWith(response);
         } else {
           const response = await options.onRequest(request);
-          event.respondWith(response);
+          await event.respondWith(response);
         }
       }
     })();
