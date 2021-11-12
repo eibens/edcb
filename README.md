@@ -24,7 +24,7 @@ coverage][coverage-shield]][coverage]
 - TypeScript API for [configuration and version locking](#config).
 - Easy CI integration (see [ci.yml](.github/workflows/ci.yml)).
 
-# CLI
+# Usage
 
 Install the [edcb] CLI with [Deno]:
 
@@ -32,15 +32,22 @@ Install the [edcb] CLI with [Deno]:
 deno install -f -A --unstable https://deno.land/x/edcb/cli.ts
 ```
 
-Print the help text:
+These are basic commands:
 
 ```sh
-edcb -h
+# show help text and options
+edcb
 edcb check -h
 edcb serve -h
+
+# run formatter, linter, tests
+edcb check
+
+# start development server
+edcb serve
 ```
 
-# Config
+## Config
 
 Before it does anything else, [edcb] will look for the [dev.ts](dev.ts) module
 in the working directory and run it if it exists. The `edcb` CLI then
