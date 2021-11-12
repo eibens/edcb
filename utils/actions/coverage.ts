@@ -11,6 +11,7 @@ export async function coverage(options: CoverageOptions): Promise<void> {
       "deno",
       "test",
       "-A",
+      "--doc",
       "--unstable",
       "--coverage=" + options.dir,
       ...(options.tests ? [options.tests] : []),
