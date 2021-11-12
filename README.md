@@ -61,7 +61,7 @@ import { cli } from "https://deno.land/x/edcb@xyz/cli.ts";
 await cli({
   // default options for check
   check: {
-    ignore: "deps",
+    ignore: "docs",
   },
   // default options for serve
   serve: {
