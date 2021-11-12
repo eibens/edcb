@@ -28,7 +28,7 @@ export function withLayoutLogger<
 
         const data = {
           title: "edcb",
-          args: Deno.args.join(""),
+          args: Deno.args.join(" "),
           version: version.tag,
           description: "A build tool and task runner for Deno.",
           author: "Lukas Eibensteiner",
