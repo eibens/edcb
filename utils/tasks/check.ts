@@ -1,4 +1,4 @@
-import { parseFlags } from "../flags.ts";
+import { parse } from "../../deps/flags.ts";
 import { check as help } from "../help.ts";
 import { withMap } from "../middleware/with_map.ts";
 // actions
@@ -32,19 +32,19 @@ export type CheckOptions = {
 function parseOptions(
   options: Partial<CheckOptions & { args: string[] }> = {},
 ): CheckOptions {
-  return parseFlags(options.args || Deno.args, {
+  const flags = parse(options.args || Deno.args, {
     boolean: ["ci", "debug", "help"],
-    string: ["ignore", "temp", "tests"],
+    string: ["ignore", "temp", "tests", "codecov"],
     alias: { help: "h" },
-    default: {
-      help: false,
-      debug: Boolean(options.debug),
-      ci: Boolean(options.ci),
-      ignore: options.ignore || "",
-      temp: options.temp || "",
-      tests: options.tests || "",
-    },
   });
+  return {
+    help: flags.help || options.help,
+    debug: flags.debug || options.debug,
+    ci: flags.ci || options.ci,
+    ignore: flags.ignore || options.ignore || "",
+    temp: flags.temp || options.temp || "",
+    tests: flags.tests || options.tests || "",
+  };
 }
 
 export async function check(

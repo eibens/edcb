@@ -1,4 +1,4 @@
-import { parseFlags } from "../flags.ts";
+import { parse } from "../../deps/flags.ts";
 import { serve as help } from "../help.ts";
 import { withMap } from "../middleware/with_map.ts";
 import { createBundler } from "../bundler.ts";
@@ -36,33 +36,26 @@ export type ServeOptions = {
 function parseOptions(
   options: Partial<ServeOptions & { args: string[] }>,
 ): ServeOptions {
-  const flags = parseFlags(options.args || Deno.args, {
+  const flags = parse(options.args || Deno.args, {
     boolean: ["reload", "debug", "help"],
     string: ["port", "hostname", "root", "web-root"],
     alias: { help: "h" },
-    default: {
-      help: false,
-      debug: Boolean(options.debug),
-      reload: Boolean(options.reload),
-      port: options.port ? String(options.port) : "8080",
-      hostname: options.hostname || "localhost",
-      root: options.root || ".",
-      "web-root": options.webRoot || "docs",
-    },
   });
 
-  const port = parseInt(flags.port);
+  const portString = flags.port || options.port || "8080";
+  const port = parseInt(portString);
   if (isNaN(port)) {
-    throw new Error(`Value "${options.port}" is not a valid port number.`);
+    throw new Error(`Value "${portString}" is not a valid port number.`);
   }
+
   return {
     port,
-    help: flags.help,
-    debug: flags.debug,
-    hostname: flags.hostname,
-    reload: flags.reload,
-    root: flags.root,
-    webRoot: flags["web-root"],
+    help: flags.help || options.help,
+    debug: flags.debug || options.debug,
+    hostname: flags.hostname || options.hostname || "localhost",
+    reload: flags.reload || options.reload,
+    root: flags.root || options.root || ".",
+    webRoot: flags["web-root"] || options.webRoot || "docs",
     bundles: options.bundles || [],
   };
 }
