@@ -5,7 +5,6 @@ const configInfo = "See: https://github.com/eibens/edcb#config";
 
 export const home = `
 edcb: Linting, testing, bundling and more for Deno projects.
-${info}
 
 Usage:
   edcb -h | --help
@@ -20,11 +19,12 @@ Options:
 Config:
   edcb uses a TypeScript file 'dev.ts' for configuration.
   ${configInfo}
+
+${info}
 `.trim();
 
 export const check = `
 edcb-check: Format, lint, and test Deno code.
-${info}
 
 Usage: edcb check [options]
 
@@ -36,11 +36,12 @@ Options:
   --temp=<path>        Specify location for temporary files.
   --tests=<path>       Single file pattern for locating unit tests.
   --codecov[=<token>]  Upload coverage file to codecov.io.
+
+${info}
 `.trim();
 
 export const serve = `
 edcb-serve: Serve a Deno project for development.
-${info}
 
 Usage: edcb serve [options]
 
@@ -57,4 +58,6 @@ Config:
   The 'bundles' options is not available on the CLI.
   Provide this option in your 'dev.ts' file.
   ${configInfo}
+
+${info}
 `.trim();
