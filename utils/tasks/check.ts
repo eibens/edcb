@@ -1,8 +1,8 @@
 import { parse } from "../../deps/flags.ts";
+import { join } from "../../deps/path.ts";
 import { check as help } from "../help.ts";
 import { withMap } from "../middleware/with_map.ts";
 // actions
-import { check as _check } from "../actions/check.ts";
 import { codecov } from "../actions/codecov.ts";
 import { coverage } from "../actions/coverage.ts";
 import { exec } from "../actions/exec.ts";
@@ -75,15 +75,39 @@ export async function check(
 
 class CheckTask {
   async check(options: CheckOptions) {
-    return _check({
-      ...options,
-      temp: options.temp || await this.makeTempDir(),
-      codecov: this.codecov.bind(this),
-      coverage: this.coverage.bind(this),
-      fmt: this.fmt.bind(this),
-      lcov: this.lcov.bind(this),
-      lint: this.lint.bind(this),
+    await this.fmt({
+      ignore: options.ignore,
+      check: options.ci,
     });
+
+    await this.lint({
+      ignore: options.ignore,
+    });
+
+    const temp = options.temp || await this.makeTempDir();
+    const covDir = join(temp, "coverage");
+
+    await this.coverage({
+      dir: covDir,
+      tests: options.tests,
+    });
+
+    if (options.ci) {
+      const covFile = join(covDir, "coverage.lcov");
+      const scriptFile = join(temp, "codecov.bash");
+      const codecovUrl = "https://codecov.io/bash";
+
+      await this.lcov({
+        dir: covDir,
+        file: covFile,
+      });
+
+      await this.codecov({
+        lcovFile: covFile,
+        scriptFile: scriptFile,
+        scriptUrl: codecovUrl,
+      });
+    }
   }
 
   exec(options: Deno.RunOptions) {
