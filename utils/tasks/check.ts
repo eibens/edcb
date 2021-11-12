@@ -91,6 +91,7 @@ class CheckTask {
 
     await this.coverage({
       dir: covDir,
+      ignore: options.ignore,
       tests: options.tests,
     });
 
@@ -150,6 +151,7 @@ class CheckTask {
   coverage(options: {
     dir: string;
     tests: string;
+    ignore: string;
   }) {
     return coverage({
       ...options,
