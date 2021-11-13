@@ -1,19 +1,22 @@
 import { cli } from "./cli.ts";
 
 if (import.meta.main) {
-  const bundles = [{
-    tsconfig: "docs/tsconfig.json",
-    source: "docs/example_script.ts",
-    target: "example_script.js",
-  }];
+  const options = {
+    webRoot: "docs",
+    bundles: [{
+      tsconfig: "docs/tsconfig.json",
+      source: "docs/example_script.ts",
+      target: "example_script.js",
+    }],
+  };
   await cli({
     build: {
+      ...options,
       ignore: "build",
-      bundles,
     },
     serve: {
+      ...options,
       reload: true,
-      bundles,
     },
   });
 }

@@ -35,7 +35,7 @@ Options:
   --ignore=<paths>     Comma-separated list of paths to ignore.
   --temp=<path>        Specify location for temporary files.
   --tests=<path>       Single file pattern for locating unit tests.
-  --web-root=<path>  Root for static file serving [default: docs]
+  --web-root=<path>  Root for static file serving [default: .]
   --codecov[=<token>]  Upload coverage file to codecov.io.
 
 Config:
@@ -56,7 +56,7 @@ Options:
   --debug            Print sub-process output.
   --reload           Enable file change broadcasts via WebSocket.
   --root=<path>      Root for file watcher [default: .].
-  --web-root=<path>  Root for static file serving [default: docs]
+  --web-root=<path>  Root for static file serving [default: .]
   --hostname=<name>  HTTP server hostname [default: localhost].
   --port=<num>       HTTP server port [default: 8080].
 

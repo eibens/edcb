@@ -66,18 +66,16 @@ the command-line. This is an example of a `dev.ts` file:
 import { cli } from "https://deno.land/x/edcb@xyz/cli.ts";
 
 const common = {
-  webRoot: "docs",
-  // not available in the CLI
   bundles: [{
-    source: "index.ts", // relative to root
-    target: "index.js", // relative to webRoot
+    source: "index.ts",
+    target: "index.js",
   }],
 };
 
 await cli({
   build: {
     ...common,
-    ignore: "docs",
+    ignore: "index.js",
   },
   serve: {
     ...common,
@@ -92,7 +90,7 @@ Use individual commands by importing them from [mod.ts](mod.ts):
 import { build } from "./mod.ts";
 
 await build({
-  ignore: "docs",
+  ignore: "index.js",
 });
 ```
 

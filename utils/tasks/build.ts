@@ -54,7 +54,7 @@ function parseOptions(
     temp: flags.temp || options.temp || "",
     tests: flags.tests || options.tests || "",
     codecov: flags.codecov !== undefined ? flags.codecov : options.codecov,
-    webRoot: flags["web-root"] || options.webRoot || "docs",
+    webRoot: flags["web-root"] || options.webRoot || ".",
     bundles: options.bundles || [],
   };
 }

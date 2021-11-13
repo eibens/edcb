@@ -55,7 +55,7 @@ function parseOptions(
     hostname: flags.hostname || options.hostname || "localhost",
     reload: flags.reload || options.reload,
     root: flags.root || options.root || ".",
-    webRoot: flags["web-root"] || options.webRoot || "docs",
+    webRoot: flags["web-root"] || options.webRoot || ".",
     bundles: options.bundles || [],
   };
 }
