@@ -65,21 +65,23 @@ the command-line. This is an example of a `dev.ts` file:
 // lock edcb to a particular version ('xyz' in this case)
 import { cli } from "https://deno.land/x/edcb@xyz/cli.ts";
 
+const common = {
+  webRoot: "docs",
+  // not available in the CLI
+  bundles: [{
+    source: "index.ts", // relative to root
+    target: "index.js", // relative to webRoot
+  }],
+};
+
 await cli({
-  // default options for build
   build: {
+    ...common,
     ignore: "docs",
   },
-  // default options for serve
   serve: {
-    port: 8080,
-    root: ".",
-    webRoot: "docs",
-    // not available in the CLI
-    bundles: [{
-      source: "index.ts", // relative to root
-      target: "index.js", // relative to webRoot
-    }],
+    ...common,
+    reload: true,
   },
 });
 ```

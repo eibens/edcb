@@ -1,8 +1,10 @@
 import { parse } from "../../deps/flags.ts";
 import { join } from "../../deps/path.ts";
 import { build as help } from "../help.ts";
+import { bundleAll } from "../bundler.ts";
 import { withMap } from "../middleware/with_map.ts";
 // actions
+import { bundle } from "../actions/bundle.ts";
 import { codecov } from "../actions/codecov.ts";
 import { coverage } from "../actions/coverage.ts";
 import { exec } from "../actions/exec.ts";
@@ -28,6 +30,12 @@ export type CheckOptions = {
   temp: string;
   tests: string;
   codecov?: string;
+  webRoot: string;
+  bundles: {
+    source: string;
+    target: string;
+    tsconfig?: string;
+  }[];
 };
 
 function parseOptions(
@@ -35,7 +43,7 @@ function parseOptions(
 ): CheckOptions {
   const flags = parse(options.args || Deno.args, {
     boolean: ["check", "debug", "help"],
-    string: ["ignore", "temp", "tests", "codecov"],
+    string: ["ignore", "temp", "tests", "codecov", "web-root"],
     alias: { help: "h" },
   });
   return {
@@ -46,6 +54,8 @@ function parseOptions(
     temp: flags.temp || options.temp || "",
     tests: flags.tests || options.tests || "",
     codecov: flags.codecov !== undefined ? flags.codecov : options.codecov,
+    webRoot: flags["web-root"] || options.webRoot || "docs",
+    bundles: options.bundles || [],
   };
 }
 
@@ -95,6 +105,14 @@ class CheckTask {
       tests: options.tests,
     });
 
+    if (!options.check) {
+      await bundleAll({
+        bundles: options.bundles,
+        webRoot: options.webRoot,
+        bundle: this.bundle.bind(this),
+      });
+    }
+
     if (options.codecov !== undefined) {
       const covFile = join(covDir, "coverage.lcov");
       const scriptFile = join(temp, "codecov.bash");
@@ -118,6 +136,19 @@ class CheckTask {
     return exec({
       ...options,
       run: (options) => Promise.resolve(Deno.run(options)),
+    });
+  }
+
+  bundle(options: {
+    source: string;
+    target: string;
+    tsconfig?: string;
+  }) {
+    return bundle({
+      ...options,
+      lstat: Deno.lstat,
+      mkdir: this.mkdir.bind(this),
+      exec: this.exec.bind(this),
     });
   }
 
