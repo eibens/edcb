@@ -22,7 +22,7 @@ import { createTreeLogger } from "../tree_logger.ts";
 
 export type CheckOptions = {
   help: boolean;
-  ci: boolean;
+  check: boolean;
   debug: boolean;
   ignore: string;
   temp: string;
@@ -34,14 +34,14 @@ function parseOptions(
   options: Partial<CheckOptions & { args: string[] }> = {},
 ): CheckOptions {
   const flags = parse(options.args || Deno.args, {
-    boolean: ["ci", "debug", "help"],
+    boolean: ["check", "debug", "help"],
     string: ["ignore", "temp", "tests", "codecov"],
     alias: { help: "h" },
   });
   return {
     help: flags.help || options.help,
     debug: flags.debug || options.debug,
-    ci: flags.ci || options.ci,
+    check: flags.check || options.check,
     ignore: flags.ignore || options.ignore || "",
     temp: flags.temp || options.temp || "",
     tests: flags.tests || options.tests || "",
@@ -79,7 +79,7 @@ class CheckTask {
   async build(options: CheckOptions) {
     await this.fmt({
       ignore: options.ignore,
-      check: options.ci,
+      check: options.check,
     });
 
     await this.lint({

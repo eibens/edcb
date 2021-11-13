@@ -31,7 +31,7 @@ Usage: edcb build [options]
 Options: 
   -h --help            Show this help text.
   --debug              Print sub-process output.
-  --ci                 Check formatting without changing the code.
+  --check              Verifies a clean build (useful for CI).
   --ignore=<paths>     Comma-separated list of paths to ignore.
   --temp=<path>        Specify location for temporary files.
   --tests=<path>       Single file pattern for locating unit tests.
