@@ -9,7 +9,7 @@ edcb: Linting, testing, bundling and more for Deno projects.
 Usage:
   edcb -h | --help
   edcb -v | --version
-  edcb check -h | --help | [options]
+  edcb build -h | --help | [options]
   edcb serve -h | --help | [options]
 
 Options:
@@ -23,10 +23,10 @@ Config:
 ${info}
 `.trim();
 
-export const check = `
-edcb-check: Format, lint, and test Deno code.
+export const build = `
+edcb-build: Format, lint, test, and bundle Deno code.
 
-Usage: edcb check [options]
+Usage: edcb build [options]
 
 Options: 
   -h --help            Show this help text.

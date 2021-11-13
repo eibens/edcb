@@ -1,6 +1,6 @@
 import { parse } from "../../deps/flags.ts";
 import { join } from "../../deps/path.ts";
-import { check as help } from "../help.ts";
+import { build as help } from "../help.ts";
 import { withMap } from "../middleware/with_map.ts";
 // actions
 import { codecov } from "../actions/codecov.ts";
@@ -49,7 +49,7 @@ function parseOptions(
   };
 }
 
-export async function check(
+export async function build(
   options: Partial<CheckOptions & { args: string[] }> = {},
 ) {
   const opts = parseOptions(options);
@@ -72,11 +72,11 @@ export async function check(
       writeFile: withWriteFileLogger(tree.item),
     }),
   );
-  await Logger(task).check(opts);
+  await Logger(task).build(opts);
 }
 
 class CheckTask {
-  async check(options: CheckOptions) {
+  async build(options: CheckOptions) {
     await this.fmt({
       ignore: options.ignore,
       check: options.ci,

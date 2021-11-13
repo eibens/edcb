@@ -37,11 +37,11 @@ These are basic commands:
 ```sh
 # show help text and options
 edcb
-edcb check -h
+edcb build -h
 edcb serve -h
 
-# run formatter, linter, tests
-edcb check
+# run formatter, linter, tests, and bundler
+edcb build
 
 # start development server
 edcb serve
@@ -57,7 +57,7 @@ values for options, and add complex configuration such as the `bundles` option.
 
 The [cli.ts](cli.ts) module exports the `cli` function, which can be used to
 start the CLI manually using TypeScript. The specified options will serve as
-defaults. For example, one can specify the `ignore` option for the `check`
+defaults. For example, one can specify the `ignore` option for the `build`
 command, which will then be used if the `--ignore` option was not provided on
 the command-line. This is an example of a `dev.ts` file:
 
@@ -66,8 +66,8 @@ the command-line. This is an example of a `dev.ts` file:
 import { cli } from "https://deno.land/x/edcb@xyz/cli.ts";
 
 await cli({
-  // default options for check
-  check: {
+  // default options for build
+  build: {
     ignore: "docs",
   },
   // default options for serve
@@ -87,10 +87,10 @@ await cli({
 Use individual commands by importing them from [mod.ts](mod.ts):
 
 ```ts
-import { check } from "./mod.ts";
+import { build } from "./mod.ts";
 
-await check({
-  ignore: "deps",
+await build({
+  ignore: "docs",
 });
 ```
 

@@ -2,8 +2,8 @@ import { cli } from "./cli.ts";
 
 if (import.meta.main) {
   await cli({
-    check: {
-      ignore: "docs",
+    build: {
+      ignore: "build",
     },
     serve: {
       reload: true,

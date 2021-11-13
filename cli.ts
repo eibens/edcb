@@ -1,4 +1,4 @@
-import { check, CheckOptions, ServeOptions } from "./mod.ts";
+import { build, CheckOptions, ServeOptions } from "./mod.ts";
 import { serve } from "./mod.ts";
 import { home } from "./utils/tasks/home.ts";
 
@@ -15,7 +15,7 @@ if (import.meta.main) {
 
 export type CliOptions = {
   serve: Partial<ServeOptions>;
-  check: Partial<CheckOptions>;
+  build: Partial<CheckOptions>;
 };
 
 export async function cli(options: Partial<CliOptions> = {}) {
@@ -26,7 +26,7 @@ export async function cli(options: Partial<CliOptions> = {}) {
   > = {
     home: () => home(),
     serve: () => serve(options.serve),
-    check: () => check(options.check),
+    build: () => build(options.build),
   };
   const command = commands[key] || commands.home;
   return await command({ args });
