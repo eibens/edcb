@@ -12,7 +12,7 @@ if (import.meta.main) {
   await cli({
     build: {
       ...options,
-      ignore: "build",
+      ignore: "docs",
     },
     serve: {
       ...options,
