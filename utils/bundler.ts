@@ -22,6 +22,7 @@ export type BundleAction = (options: BundleOptions) => Promise<void>;
 export async function bundleAll(options: BundlerOptions) {
   for await (const bundle of options.bundles) {
     await options.bundle({
+      tsconfig: bundle.tsconfig,
       source: bundle.source,
       target: join(options.webRoot, bundle.target),
     });
@@ -33,12 +34,14 @@ export function createBundler(options: BundlerOptions): Bundler {
     dirty: boolean;
     source: string;
     target: string;
+    tsconfig?: string;
   }>();
 
   // Map absolute bundle path to a dirty flag.
   options.bundles.forEach((bundle) => {
     bundles.set(keyFromTarget(bundle.target), {
       dirty: true,
+      tsconfig: bundle.tsconfig,
       source: bundle.source,
       target: normalize(join(options.webRoot, bundle.target)),
     });
