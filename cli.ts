@@ -29,7 +29,13 @@ export async function cli(options: Partial<CliOptions> = {}) {
     build: () => build(options.build),
   };
   const command = commands[key] || commands.home;
-  return await command({ args });
+  try {
+    await command({ args });
+  } catch (error) {
+    // ignore errors that were already handled
+    if ("logged" in error) return;
+    throw error;
+  }
 }
 
 async function runScript(file: string, args: string[]) {

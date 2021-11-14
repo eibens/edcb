@@ -24,6 +24,8 @@ export function withErrorLogger<T extends FuncMap>(log: TreeLogger) {
         log.close(
           fmt.level("error")`Message size: ${fmt.bytes(text.length)}`,
         );
+        // mark error as handled
+        Reflect.set(error, "logged", true);
         throw error;
       },
     })
