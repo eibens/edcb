@@ -1,14 +1,13 @@
 import { withRunner } from "../../middleware/with_runner.ts";
 import * as fmt from "../../fmt.ts";
 
-type RequestHandler = (options: {
+type ServeFileAction = (options: {
   request: Request;
   webRoot: string;
-  updateBundle: (url: string) => Promise<void>;
 }) => Promise<Response>;
 
-export function withRequestLogger(log: (x: string) => void) {
-  return withRunner<RequestHandler>({
+export function withServeFileLogger(log: (x: string) => void) {
+  return withRunner<ServeFileAction>({
     input: (options) => {
       const { pathname } = new URL(options.request.url);
       log(

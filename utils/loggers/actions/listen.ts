@@ -1,22 +1,14 @@
 import { withRunner } from "../../middleware/with_runner.ts";
 import * as fmt from "../../fmt.ts";
 
-type ServeAction = (options: {
-  help: boolean;
+type ListenAction = (options: {
   hostname: string;
   port: number;
-  webRoot: string;
-  root: string;
-  debug: boolean;
-  reload: boolean;
-  bundles: {
-    source: string;
-    target: string;
-    tsconfig?: string;
-  }[];
+  onSocket: (socket: WebSocket) => void;
+  onRequest: (request: Request) => Promise<Response>;
 }) => Promise<void>;
 
-export function withServeLogger<F extends ServeAction>(
+export function withListenLogger<F extends ListenAction>(
   log: (x: string) => void,
 ) {
   return withRunner<F>({

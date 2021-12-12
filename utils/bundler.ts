@@ -19,16 +19,6 @@ export type BundlerOptions = {
 
 export type BundleAction = (options: BundleOptions) => Promise<void>;
 
-export async function bundleAll(options: BundlerOptions) {
-  for await (const bundle of options.bundles) {
-    await options.bundle({
-      tsconfig: bundle.tsconfig,
-      source: bundle.source,
-      target: join(options.webRoot, bundle.target),
-    });
-  }
-}
-
 export function createBundler(options: BundlerOptions): Bundler {
   const bundles = new Map<string, {
     dirty: boolean;

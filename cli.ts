@@ -1,5 +1,6 @@
-import { build, serve } from "./mod.ts";
+import { Actions } from "./utils/actions.ts";
 import { help } from "./utils/help.ts";
+import { withLogger } from "./utils/loggers/logger.ts";
 import { Options, parseOptions } from "./utils/options.ts";
 import { version } from "./version.ts";
 
@@ -29,11 +30,16 @@ export async function cli(defaults: Partial<Options> = {}): Promise<void> {
       return;
     }
 
+    const actions = withLogger({
+      debug: options.debug,
+      log: console.log,
+    })(new Actions());
+
     switch (options.command) {
       case "build":
-        return await build(options);
+        return await actions.build(options);
       case "serve":
-        return await serve(options);
+        return await actions.serve(options);
     }
   } catch (error) {
     // ignore errors that were already handled
