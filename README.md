@@ -4,12 +4,15 @@
 linting, testing, code coverage, bundling, and more, and it can be used via
 command line or TypeScript import.
 
-[![License][license-shield]](LICENSE)
-[![Deno module][deno-land-shield]][deno-land]
-[![Github
-tag][github-shield]][github] [![Build][build-shield]][build]
-[![Code
-coverage][coverage-shield]][coverage]
+<!-- badges -->
+
+[![License](https://img.shields.io/github/license/eibens/edcb?color=informational)](LICENSE)
+[![deno.land/x](https://img.shields.io/badge/x/edcb-informational?logo=deno&label)](https://deno.land/x/edcb)
+[![Repository](https://img.shields.io/github/v/tag/eibens/edcb?label&logo=github)](https://github.com/eibens/edcb)
+[![ci](https://github.com/eibens/edcb/actions/workflows/ci.yml/badge.svg)](https://github.com/eibens/edcb/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/eibens/edcb/branch/master/graph/badge.svg?token=OV98O91EJ1)](https://codecov.io/gh/eibens/edcb)
+
+<!-- /badges -->
 
 ![edcb in action](docs/video.gif)
 
@@ -35,10 +38,8 @@ deno install -f -A --unstable https://deno.land/x/edcb/cli.ts
 These are basic commands:
 
 ```sh
-# show help text and options
-edcb
-edcb build -h
-edcb serve -h
+# show help text
+edcb --help
 
 # run formatter, linter, tests, and bundler
 edcb build
@@ -50,63 +51,41 @@ edcb serve
 ## Config
 
 Before it does anything else, [edcb] will look for the [dev.ts](dev.ts) module
-in the working directory and run it if it exists. The `edcb` CLI then
-essentially becomes an alias for `deno run -A --unstable dev.ts [args]`. This
-allows one to lock a particular [edcb] version to a project, provide default
-values for options, and add complex configuration such as the `bundles` option.
+in the working directory and run it if it exists. This allows one to lock a
+particular [edcb] version to a project, provide default values for options, and
+add complex configuration such as the `bundles` option. The `edcb` CLI then
+essentially becomes an alias for this:
+
+```sh
+deno run -A --unstable dev.ts [...args]
+```
 
 The [cli.ts](cli.ts) module exports the `cli` function, which can be used to
-start the CLI manually using TypeScript. The specified options will serve as
-defaults. For example, one can specify the `ignore` option for the `build`
-command, which will then be used if the `--ignore` option was not provided on
-the command-line. This is an example of a `dev.ts` file:
+start the CLI manually using TypeScript. The specified options are used as
+defaults. For example, one can specify the `ignore` option, which will then be
+used if the `--ignore` option was not provided on the command-line. This is an
+example of a `dev.ts` file that uses [edcb]'s TypeScript API:
 
 ```ts
-// lock edcb to a particular version ('xyz' in this case)
-import { cli } from "https://deno.land/x/edcb@xyz/cli.ts";
+/**
+ * Always import a specific version of edcb.
+ * Otherwise, your builds might break when edcb updates.
+ *
+ * @example
+ *   import { cli } from "https://deno.land/x/edcb@v1.0.0/cli.ts";
+ */
+import { cli } from "./cli.ts";
 
-const common = {
+await cli({
+  ignore: "index.js",
+  reload: true,
   bundles: [{
     source: "index.ts",
     target: "index.js",
   }],
-};
-
-await cli({
-  build: {
-    ...common,
-    ignore: "index.js",
-  },
-  serve: {
-    ...common,
-    reload: true,
-  },
-});
-```
-
-Use individual commands by importing them from [mod.ts](mod.ts):
-
-```ts
-import { build } from "./mod.ts";
-
-await build({
-  ignore: "index.js",
 });
 ```
 
 [edcb]: #
 [Deno]: https://deno.land
-[GitHub Actions]: https://github.com/features/actions
 [codecov.io]: https://codecov.io
-
-<!-- badges -->
-
-[github]: https://github.com/eibens/edcb
-[github-shield]: https://img.shields.io/github/v/tag/eibens/edcb?label&logo=github
-[coverage-shield]: https://img.shields.io/codecov/c/github/eibens/edcb?logo=codecov&label
-[license-shield]: https://img.shields.io/github/license/eibens/edcb?color=informational
-[coverage]: https://codecov.io/gh/eibens/edcb
-[build]: https://github.com/eibens/edcb/actions/workflows/ci.yml
-[build-shield]: https://img.shields.io/github/workflow/status/eibens/edcb/ci?logo=github&label
-[deno-land]: https://deno.land/x/edcb
-[deno-land-shield]: https://img.shields.io/badge/x/edcb-informational?logo=deno&label
