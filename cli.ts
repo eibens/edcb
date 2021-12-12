@@ -1,6 +1,7 @@
-import { build, CheckOptions, ServeOptions } from "./mod.ts";
-import { serve } from "./mod.ts";
-import { home } from "./utils/tasks/home.ts";
+import { build, serve } from "./mod.ts";
+import { help } from "./utils/help.ts";
+import { Options, parseOptions } from "./utils/options.ts";
+import { version } from "./version.ts";
 
 if (import.meta.main) {
   const devScript = "dev.ts";
@@ -13,28 +14,33 @@ if (import.meta.main) {
   }
 }
 
-export type CliOptions = {
-  serve: Partial<ServeOptions>;
-  build: Partial<CheckOptions>;
-};
-
-export async function cli(options: Partial<CliOptions> = {}) {
-  const [key, ...args] = Deno.args;
-  const commands: Record<
-    string,
-    (options: { args: string[] }) => Promise<void>
-  > = {
-    home: () => home(),
-    serve: () => serve(options.serve),
-    build: () => build(options.build),
-  };
-  const command = commands[key] || commands.home;
+export async function cli(defaults: Partial<Options> = {}): Promise<void> {
   try {
-    await command({ args });
+    const options = parseOptions(Deno.args, defaults);
+
+    if (options.help) {
+      console.log(help);
+      return;
+    }
+
+    if (options.version) {
+      const versionString = version.tag || "<unknown version>";
+      console.log("edcb " + versionString);
+      return;
+    }
+
+    switch (options.command) {
+      case "build":
+        return await build(options);
+      case "serve":
+        return await serve(options);
+    }
   } catch (error) {
     // ignore errors that were already handled
     if ("logged" in error) return;
-    throw error;
+    console.error(error.message);
+    console.log("");
+    console.log("For usage run: edcb --help");
   }
 }
 

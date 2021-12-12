@@ -1,6 +1,4 @@
-import { parse } from "../../deps/flags.ts";
 import { join } from "../../deps/path.ts";
-import { build as help } from "../help.ts";
 import { bundleAll } from "../bundler.ts";
 import { withMap } from "../middleware/with_map.ts";
 // actions
@@ -22,8 +20,7 @@ import { withWriteLogger } from "../loggers/actions/write.ts";
 import { withWriteFileLogger } from "../loggers/actions/write_file.ts";
 import { createTreeLogger } from "../tree_logger.ts";
 
-export type CheckOptions = {
-  help: boolean;
+export type BuildOptions = {
   check: boolean;
   debug: boolean;
   ignore: string;
@@ -38,43 +35,15 @@ export type CheckOptions = {
   }[];
 };
 
-function parseOptions(
-  options: Partial<CheckOptions & { args: string[] }> = {},
-): CheckOptions {
-  const flags = parse(options.args || Deno.args, {
-    boolean: ["check", "debug", "help"],
-    string: ["ignore", "temp", "tests", "codecov", "web-root"],
-    alias: { help: "h" },
-  });
-  return {
-    help: flags.help || options.help,
-    debug: flags.debug || options.debug,
-    check: flags.check || options.check,
-    ignore: flags.ignore || options.ignore || "",
-    temp: flags.temp || options.temp || "",
-    tests: flags.tests || options.tests || "",
-    codecov: flags.codecov !== undefined ? flags.codecov : options.codecov,
-    webRoot: flags["web-root"] || options.webRoot || ".",
-    bundles: options.bundles || [],
-  };
-}
-
 export async function build(
-  options: Partial<CheckOptions & { args: string[] }> = {},
+  options: BuildOptions,
 ) {
-  const opts = parseOptions(options);
-
-  if (opts.help) {
-    console.log(help);
-    return;
-  }
-
   const tree = createTreeLogger(console.log);
   const task = new CheckTask();
   const Logger = withLogger<CheckTask>(
     tree,
     withMap<CheckTask>({
-      exec: withExecLogger(tree, Boolean(opts.debug)),
+      exec: withExecLogger(tree, Boolean(options.debug)),
       fetch: withFetchLogger(tree.item),
       makeTempDir: withMakeTempDirLogger(tree.item),
       mkdir: withMkdirLogger(tree.item),
@@ -82,11 +51,11 @@ export async function build(
       writeFile: withWriteFileLogger(tree.item),
     }),
   );
-  await Logger(task).build(opts);
+  await Logger(task).build(options);
 }
 
 class CheckTask {
-  async build(options: CheckOptions) {
+  async build(options: BuildOptions) {
     await this.fmt({
       ignore: options.ignore,
       check: options.check,

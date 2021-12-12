@@ -1,69 +1,32 @@
-const info = `
-More information on GitHub: https://github.com/eibens/edcb
-`.trim();
-const configInfo = "See: https://github.com/eibens/edcb#config";
-
-export const home = `
+export const help = `
 edcb: Linting, testing, bundling and more for Deno projects.
 
-Usage:
-  edcb -h | --help
-  edcb -v | --version
-  edcb build -h | --help | [options]
-  edcb serve -h | --help | [options]
+Usage: 
+  edcb <command> [...options]
 
-Options:
-  -h --help     show this help text
-  -v --version  show the version
+Command:
+  build                Format, lint, test, and bundle files.
+  serve                Start a web-server for development.
+
+Options: 
+  -h, --help           Show this help text.
+  -v, --version        Show the version.
+  --check              Verifies a clean build (useful for CI).
+  --debug              Print sub-process output.
+  --codecov[=<token>]  Upload coverage file to codecov.io.
+  --hostname=<name>    HTTP server hostname [default: localhost].
+  --ignore=<paths>     Comma-separated list of paths to ignore.
+  --port=<num>         HTTP server port [default: 8080].
+  --reload             Enable file change broadcasts via WebSocket.
+  --root=<path>        Root for file watcher [default: .].
+  --temp=<path>        Specify location for temporary files.
+  --tests=<path>       Single file pattern for locating unit tests.
+  --web-root=<path>    Root for static file serving [default: .]
 
 Config:
   edcb uses a TypeScript file 'dev.ts' for configuration.
-  ${configInfo}
+  The 'bundles' option is only available in 'dev.ts'.
+  See: https://github.com/eibens/edcb#config
 
-${info}
-`.trim();
-
-export const build = `
-edcb-build: Format, lint, test, and bundle Deno code.
-
-Usage: edcb build [options]
-
-Options: 
-  -h --help            Show this help text.
-  --debug              Print sub-process output.
-  --check              Verifies a clean build (useful for CI).
-  --ignore=<paths>     Comma-separated list of paths to ignore.
-  --temp=<path>        Specify location for temporary files.
-  --tests=<path>       Single file pattern for locating unit tests.
-  --web-root=<path>  Root for static file serving [default: .]
-  --codecov[=<token>]  Upload coverage file to codecov.io.
-
-Config:
-  The 'bundles' options is not available on the CLI.
-  Provide this option in your 'dev.ts' file.
-  ${configInfo}
-
-${info}
-`.trim();
-
-export const serve = `
-edcb-serve: Serve a Deno project for development.
-
-Usage: edcb serve [options]
-
-Options:
-  -h --help          Show this help text.
-  --debug            Print sub-process output.
-  --reload           Enable file change broadcasts via WebSocket.
-  --root=<path>      Root for file watcher [default: .].
-  --web-root=<path>  Root for static file serving [default: .]
-  --hostname=<name>  HTTP server hostname [default: localhost].
-  --port=<num>       HTTP server port [default: 8080].
-
-Config:
-  The 'bundles' options is not available on the CLI.
-  Provide this option in your 'dev.ts' file.
-  ${configInfo}
-
-${info}
+More information: https://github.com/eibens/edcb
 `.trim();

@@ -1,5 +1,3 @@
-import { parse } from "../../deps/flags.ts";
-import { serve as help } from "../help.ts";
 import { withMap } from "../middleware/with_map.ts";
 import { createBundler } from "../bundler.ts";
 import { createBroadcast } from "../broadcast.ts";
@@ -19,7 +17,6 @@ import { withReadFileLogger } from "../loggers/actions/read_file.ts";
 import { withRequestLogger } from "../loggers/actions/request.ts";
 
 export type ServeOptions = {
-  help: boolean;
   debug: boolean;
   port: number;
   hostname: string;
@@ -33,56 +30,22 @@ export type ServeOptions = {
   }[];
 };
 
-function parseOptions(
-  options: Partial<ServeOptions & { args: string[] }>,
-): ServeOptions {
-  const flags = parse(options.args || Deno.args, {
-    boolean: ["reload", "debug", "help"],
-    string: ["port", "hostname", "root", "web-root"],
-    alias: { help: "h" },
-  });
-
-  const portString = flags.port || options.port || "8080";
-  const port = parseInt(portString);
-  if (isNaN(port)) {
-    throw new Error(`Value "${portString}" is not a valid port number.`);
-  }
-
-  return {
-    port,
-    help: flags.help || options.help,
-    debug: flags.debug || options.debug,
-    hostname: flags.hostname || options.hostname || "localhost",
-    reload: flags.reload || options.reload,
-    root: flags.root || options.root || ".",
-    webRoot: flags["web-root"] || options.webRoot || ".",
-    bundles: options.bundles || [],
-  };
-}
-
 export async function serve(
-  options: Partial<ServeOptions & { args: string[] }> = {},
+  options: ServeOptions,
 ) {
-  const opts = parseOptions(options);
-
-  if (opts.help) {
-    console.log(help);
-    return;
-  }
-
   const tree = createTreeLogger(console.log);
   const task = new ServeTask();
   const Logger = withLogger<ServeTask>(
     tree,
     withMap<ServeTask>({
-      exec: withExecLogger(tree, Boolean(opts.debug)),
+      exec: withExecLogger(tree, Boolean(options.debug)),
       mkdir: withMkdirLogger(tree.item),
       serve: withServeLogger(tree.item),
       readFile: withReadFileLogger(tree.item),
       onRequest: withRequestLogger(tree.item),
     }),
   );
-  await Logger(task).serve(opts);
+  await Logger(task).serve(options);
 }
 
 class ServeTask {
