@@ -1,4 +1,4 @@
-import { join, normalize, resolve } from "../deps/path.ts";
+import { join, normalize, resolve } from "../../deps/path.ts";
 
 export type Bundler = {
   markDirty: (path: string) => void;

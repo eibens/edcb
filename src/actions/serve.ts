@@ -1,5 +1,5 @@
-import { createBroadcast } from "../broadcast.ts";
-import { createBundler } from "../bundler.ts";
+import { createBroadcast } from "../utils/broadcast.ts";
+import { createBundler } from "../utils/bundler.ts";
 
 export type BundleOptions = {
   source: string;
