@@ -1,1 +1,1 @@
-export * from "./cli.ts";
+export * from "./src/cli/mod.ts";

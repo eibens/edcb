@@ -1,6 +1,6 @@
-import { withRunner } from "../../middleware/with_runner.ts";
-import { TreeLogger } from "../../tree_logger.ts";
-import * as fmt from "../../fmt.ts";
+import { withRunner } from "../middleware/with_runner.ts";
+import { TreeLogger } from "../tree_logger.ts";
+import * as fmt from "../fmt.ts";
 
 type ExecAction = (options: Deno.RunOptions) => Promise<{
   success: boolean;

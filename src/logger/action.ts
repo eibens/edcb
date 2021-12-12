@@ -1,7 +1,7 @@
-import * as fmt from "../fmt.ts";
-import { TreeLogger } from "../tree_logger.ts";
-import { withGetter } from "../middleware/with_getter.ts";
-import { withContainer } from "../middleware/with_container.ts";
+import * as fmt from "./fmt.ts";
+import { TreeLogger } from "./tree_logger.ts";
+import { withGetter } from "./middleware/with_getter.ts";
+import { withContainer } from "./middleware/with_container.ts";
 
 export function withActionLogger<
   T extends Record<string, (...args: unknown[]) => Promise<never>>,

@@ -1,10 +1,10 @@
-import { withChain } from "../middleware/with_chain.ts";
-import { withBinding } from "../middleware/with_binding.ts";
-import { withMap } from "../middleware/with_map.ts";
+import { withChain } from "./middleware/with_chain.ts";
+import { withBinding } from "./middleware/with_binding.ts";
+import { withMap } from "./middleware/with_map.ts";
 import { withErrorLogger } from "./error.ts";
 import { withActionLogger } from "./action.ts";
 import { withLayoutLogger } from "./layout.ts";
-import { createTreeLogger } from "../tree_logger.ts";
+import { createTreeLogger } from "./tree_logger.ts";
 import { withExecLogger } from "./actions/exec.ts";
 import { withFetchLogger } from "./actions/fetch.ts";
 import { withMakeTempDirLogger } from "./actions/make_temp_dir.ts";
@@ -14,7 +14,7 @@ import { withWriteFileLogger } from "./actions/write_file.ts";
 import { withReadFileLogger } from "./actions/read_file.ts";
 import { withListenLogger } from "./actions/listen.ts";
 import { withServeFileLogger } from "./actions/serve_file.ts";
-import { Actions } from "../actions.ts";
+import { Actions } from "../runner/actions.ts";
 
 type Async<T> = T | Promise<T>;
 

@@ -60,11 +60,11 @@ essentially becomes an alias for this:
 deno run -A --unstable dev.ts [...args]
 ```
 
-The [cli.ts](cli.ts) module exports the `cli` function, which can be used to
-start the CLI manually using TypeScript. The specified options are used as
-defaults. For example, one can specify the `ignore` option, which will then be
-used if the `--ignore` option was not provided on the command-line. This is an
-example of a `dev.ts` file that uses [edcb]'s TypeScript API:
+The [mod.ts](mod.ts) module exports the `cli` function, which can be used to run
+the CLI using TypeScript. The specified options are used as defaults. For
+example, one can specify the `ignore` option, which will then be used if the
+`--ignore` option was not provided on the command-line. This is an example of a
+`dev.ts` file that uses [edcb]'s TypeScript API:
 
 ```ts
 /**
@@ -72,9 +72,9 @@ example of a `dev.ts` file that uses [edcb]'s TypeScript API:
  * Otherwise, your builds might break when edcb updates.
  *
  * @example
- *   import { cli } from "https://deno.land/x/edcb@v1.0.0/cli.ts";
+ *   import { cli } from "https://deno.land/x/edcb@v1.0.0/mod.ts";
  */
-import { cli } from "./cli.ts";
+import { cli } from "./mod.ts";
 
 await cli({
   ignore: "index.js",

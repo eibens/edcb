@@ -1,4 +1,4 @@
-import { cli } from "./cli.ts";
+import { cli } from "./mod.ts";
 
 if (import.meta.main) {
   await cli({

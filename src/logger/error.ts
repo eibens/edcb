@@ -1,7 +1,7 @@
-import { withGetter } from "../middleware/with_getter.ts";
-import { withRunner } from "../middleware/with_runner.ts";
-import { TreeLogger } from "../tree_logger.ts";
-import * as fmt from "../fmt.ts";
+import { withGetter } from "./middleware/with_getter.ts";
+import { withRunner } from "./middleware/with_runner.ts";
+import { TreeLogger } from "./tree_logger.ts";
+import * as fmt from "./fmt.ts";
 
 type FuncMap = Record<string, (...args: unknown[]) => Promise<never>>;
 

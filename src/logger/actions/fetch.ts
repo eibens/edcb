@@ -1,5 +1,5 @@
-import { withRunner } from "../../middleware/with_runner.ts";
-import * as fmt from "../../fmt.ts";
+import { withRunner } from "../middleware/with_runner.ts";
+import * as fmt from "../fmt.ts";
 
 type FetchAction = (url: string | URL, init?: RequestInit) => Promise<Response>;
 

@@ -1,8 +1,4 @@
-import { Actions } from "./utils/actions.ts";
-import { help } from "./utils/help.ts";
-import { withLogger } from "./utils/loggers/logger.ts";
-import { Options, parseOptions } from "./utils/options.ts";
-import { version } from "./version.ts";
+import { cli } from "./src/cli/mod.ts";
 
 if (import.meta.main) {
   const devScript = "dev.ts";
@@ -12,41 +8,6 @@ if (import.meta.main) {
     await runScript(devScript, Deno.args);
   } else {
     await cli();
-  }
-}
-
-export async function cli(defaults: Partial<Options> = {}): Promise<void> {
-  try {
-    const options = parseOptions(Deno.args, defaults);
-
-    if (options.help) {
-      console.log(help);
-      return;
-    }
-
-    if (options.version) {
-      const versionString = version.tag || "<unknown version>";
-      console.log("edcb " + versionString);
-      return;
-    }
-
-    const actions = withLogger({
-      debug: options.debug,
-      log: console.log,
-    })(new Actions());
-
-    switch (options.command) {
-      case "build":
-        return await actions.build(options);
-      case "serve":
-        return await actions.serve(options);
-    }
-  } catch (error) {
-    // ignore errors that were already handled
-    if ("logged" in error) return;
-    console.error(error.message);
-    console.log("");
-    console.log("For usage run: edcb --help");
   }
 }
 

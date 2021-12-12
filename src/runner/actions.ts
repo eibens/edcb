@@ -1,16 +1,16 @@
-import { build } from "./actions/build.ts";
-import { bundle } from "./actions/bundle.ts";
-import { codecov } from "./actions/codecov.ts";
-import { coverage } from "./actions/coverage.ts";
-import { exec } from "./actions/exec.ts";
-import { fmt } from "./actions/fmt.ts";
-import { lcov } from "./actions/lcov.ts";
-import { lint } from "./actions/lint.ts";
-import { listen } from "./actions/listen.ts";
-import { serveFile } from "./actions/serve_file.ts";
-import { serve } from "./actions/serve.ts";
-import { watch } from "./actions/watch.ts";
-import { write } from "./actions/write.ts";
+import { build } from "../actions/build.ts";
+import { bundle } from "../actions/bundle.ts";
+import { codecov } from "../actions/codecov.ts";
+import { coverage } from "../actions/coverage.ts";
+import { exec } from "../actions/exec.ts";
+import { fmt } from "../actions/fmt.ts";
+import { lcov } from "../actions/lcov.ts";
+import { lint } from "../actions/lint.ts";
+import { listen } from "../actions/listen.ts";
+import { serveFile } from "../actions/serve_file.ts";
+import { serve } from "../actions/serve.ts";
+import { watch } from "../actions/watch.ts";
+import { write } from "../actions/write.ts";
 
 export class Actions {
   build(options: {

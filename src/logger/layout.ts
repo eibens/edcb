@@ -1,8 +1,8 @@
-import * as fmt from "../fmt.ts";
 import { version } from "../../version.ts";
-import { TreeLogger } from "../tree_logger.ts";
-import { withGetter } from "../middleware/with_getter.ts";
-import { withRunner } from "../middleware/with_runner.ts";
+import * as fmt from "./fmt.ts";
+import { TreeLogger } from "./tree_logger.ts";
+import { withGetter } from "./middleware/with_getter.ts";
+import { withRunner } from "./middleware/with_runner.ts";
 
 export type DocLogger = {
   header: () => void;

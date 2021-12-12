@@ -1,5 +1,5 @@
-import { withRunner } from "../../middleware/with_runner.ts";
-import * as fmt from "../../fmt.ts";
+import { withRunner } from "../middleware/with_runner.ts";
+import * as fmt from "../fmt.ts";
 
 type WriteFileAction = typeof Deno.writeFile;
 

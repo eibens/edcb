@@ -1,4 +1,4 @@
-import { parse } from "../deps/flags.ts";
+import { parse } from "../../deps/flags.ts";
 
 const COMMANDS = [
   "build",

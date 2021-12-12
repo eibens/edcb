@@ -1,5 +1,5 @@
-export * from "../deps/colors.ts";
-import * as fmt from "../deps/colors.ts";
+export * from "../../deps/colors.ts";
+import * as fmt from "../../deps/colors.ts";
 
 export type Level =
   | "info"
