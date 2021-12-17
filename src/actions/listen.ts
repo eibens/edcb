@@ -26,7 +26,11 @@ export async function listen(options: ListenOptions) {
           await event.respondWith(response);
         } else {
           const response = await options.onRequest(request);
-          await event.respondWith(response);
+          try {
+            await event.respondWith(response);
+          } catch (error) {
+            console.error(error);
+          }
         }
       }
     })();
