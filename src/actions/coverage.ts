@@ -7,6 +7,8 @@ export type CoverageOptions = {
 };
 
 export async function coverage(options: CoverageOptions): Promise<void> {
+  const unstable = options.unstable ? ["--unstable"] : [];
+
   // Test
   const ignore = options.ignore ? ["--ignore=" + options.ignore] : [];
   const testResult = await options.exec({
@@ -15,7 +17,7 @@ export async function coverage(options: CoverageOptions): Promise<void> {
       "test",
       "-A",
       "--doc",
-      ...(options.unstable ? ["--unstable"] : []),
+      ...unstable,
       ...ignore,
       "--coverage=" + options.dir,
       ...(options.tests ? [options.tests] : []),
@@ -30,7 +32,12 @@ export async function coverage(options: CoverageOptions): Promise<void> {
 
   // Coverage
   const coverageResult = await options.exec({
-    cmd: ["deno", "coverage", "--unstable", options.dir],
+    cmd: [
+      "deno",
+      "coverage",
+      ...unstable,
+      options.dir,
+    ],
   });
 
   if (!coverageResult.success) {
