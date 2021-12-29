@@ -3,6 +3,7 @@ export type CoverageOptions = {
   dir: string;
   ignore: string;
   tests: string;
+  unstable: boolean;
 };
 
 export async function coverage(options: CoverageOptions): Promise<void> {
@@ -14,7 +15,7 @@ export async function coverage(options: CoverageOptions): Promise<void> {
       "test",
       "-A",
       "--doc",
-      "--unstable",
+      ...(options.unstable ? ["--unstable"] : []),
       ...ignore,
       "--coverage=" + options.dir,
       ...(options.tests ? [options.tests] : []),

@@ -15,6 +15,7 @@ export type BuildOptions = {
   codecov?: string;
   webRoot: string;
   bundles: BundleOptions[];
+  unstable: boolean;
   bundle: (options: BundleOptions) => Promise<void>;
   fmt: (options: {
     ignore: string;
@@ -28,6 +29,7 @@ export type BuildOptions = {
     dir: string;
     ignore: string;
     tests: string;
+    unstable: boolean;
   }) => Promise<void>;
   lcov: (options: {
     dir: string;
@@ -58,6 +60,7 @@ export async function build(options: BuildOptions) {
     dir: covDir,
     ignore: options.ignore,
     tests: options.tests,
+    unstable: options.unstable,
   });
 
   if (!options.check) {

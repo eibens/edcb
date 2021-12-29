@@ -21,6 +21,7 @@ Options:
   --root=<path>        Root for file watcher [default: .].
   --temp=<path>        Specify location for temporary files.
   --tests=<path>       Single file pattern for locating unit tests.
+  --unstable           Enable the use of unstable APIs.
   --web-root=<path>    Root for static file serving [default: .]
 
 Config:

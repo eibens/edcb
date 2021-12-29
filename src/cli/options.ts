@@ -24,6 +24,7 @@ export type Options = {
   hostname: string;
   root: string;
   reload: boolean;
+  unstable: boolean;
   bundles: {
     source: string;
     target: string;
@@ -43,6 +44,7 @@ export function parseOptions(
       "help",
       "version",
       "reload",
+      "unstable",
     ],
     string: [
       "ignore",
@@ -106,6 +108,7 @@ export function parseOptions(
     webRoot: flags["web-root"] || options.webRoot || ".",
     hostname: flags.hostname || options.hostname || "localhost",
     reload: Boolean(flags.reload || options.reload),
+    unstable: Boolean(flags.unstable || options.unstable),
     root: flags.root || options.root || ".",
   };
 }

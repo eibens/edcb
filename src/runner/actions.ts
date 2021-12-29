@@ -21,6 +21,7 @@ export class Actions {
     tests: string;
     codecov?: string;
     webRoot: string;
+    unstable: boolean;
     bundles: {
       source: string;
       target: string;
@@ -70,6 +71,7 @@ export class Actions {
     dir: string;
     tests: string;
     ignore: string;
+    unstable: boolean;
   }) {
     return coverage({
       ...options,
