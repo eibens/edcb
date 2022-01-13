@@ -11,11 +11,13 @@ Command:
 Options: 
   -h, --help           Show this help text.
   -v, --version        Show the version.
+  --config             Path to a tsconfig file.
   --check              Verifies a clean build (useful for CI).
   --debug              Print sub-process output.
   --codecov[=<token>]  Upload coverage file to codecov.io.
   --hostname=<name>    HTTP server hostname [default: localhost].
   --ignore=<paths>     Comma-separated list of paths to ignore.
+  --import-map=<path>  Path to a JSON file with an import map.
   --port=<num>         HTTP server port [default: 8080].
   --reload             Enable file change broadcasts via WebSocket.
   --root=<path>        Root for file watcher [default: .].

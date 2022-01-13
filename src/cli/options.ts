@@ -11,11 +11,13 @@ export type Command =
 
 export type Options = {
   command: Command;
+  config?: string;
   help: boolean;
   version: boolean;
   check: boolean;
   debug: boolean;
   ignore: string;
+  importMap?: string;
   temp: string;
   tests: string;
   codecov?: string;
@@ -55,6 +57,8 @@ export function parseOptions(
       "port",
       "hostname",
       "root",
+      "import-map",
+      "config",
     ],
     alias: {
       help: "h",
@@ -101,6 +105,10 @@ export function parseOptions(
     temp: flags.temp || options.temp || "",
     tests: flags.tests || options.tests || "",
     codecov: flags.codecov !== undefined ? flags.codecov : options.codecov,
+    importMap: flags.importMap !== undefined
+      ? flags.importMap
+      : options.importMap,
+    config: flags.config !== undefined ? flags.config : options.config,
     bundles: options.bundles || [],
 
     // server options

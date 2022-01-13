@@ -8,13 +8,18 @@ export type Bundler = {
 export type BundleOptions = {
   source: string;
   target: string;
-  tsconfig?: string;
+  noCheck?: boolean;
+  config?: string;
+  importMap?: string;
 };
 
 export type BundlerOptions = {
   webRoot: string;
   bundle: BundleAction;
   bundles: BundleOptions[];
+  noCheck: boolean;
+  config?: string;
+  importMap?: string;
 };
 
 export type BundleAction = (options: BundleOptions) => Promise<void>;
@@ -24,15 +29,19 @@ export function createBundler(options: BundlerOptions): Bundler {
     dirty: boolean;
     source: string;
     target: string;
-    tsconfig?: string;
+    noCheck: boolean;
+    config?: string;
+    importMap?: string;
   }>();
 
   // Map absolute bundle path to a dirty flag.
   options.bundles.forEach((bundle) => {
     bundles.set(keyFromTarget(bundle.target), {
       dirty: true,
-      tsconfig: bundle.tsconfig,
       source: bundle.source,
+      config: bundle.config || options.config,
+      noCheck: bundle.noCheck == null ? options.noCheck : bundle.noCheck,
+      importMap: bundle.importMap || options.importMap,
       target: normalize(join(options.webRoot, bundle.target)),
     });
   });

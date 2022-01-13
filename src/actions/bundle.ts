@@ -6,7 +6,9 @@ export type BundleOptions = {
   exec: (options: Deno.RunOptions) => Promise<{ success: boolean }>;
   source: string;
   target: string;
-  tsconfig?: string;
+  noCheck: boolean;
+  config?: string;
+  importMap?: string;
 };
 
 export async function bundle(options: BundleOptions): Promise<void> {
@@ -20,12 +22,19 @@ export async function bundle(options: BundleOptions): Promise<void> {
     }
   }
 
+  const noCheck = options.noCheck ? ["--no-check"] : [];
+  const config = options.config ? ["--config=" + options.config] : [];
+  const importMap = options.importMap
+    ? ["--import-map=" + options.importMap]
+    : [];
+
   const { success } = await options.exec({
     cmd: [
       "deno",
       "bundle",
-      "--no-check", // DOM use causes type errors
-      ...(options.tsconfig ? ["--config=" + options.tsconfig] : []),
+      ...noCheck,
+      ...config,
+      ...importMap,
       options.source,
       options.target,
     ],

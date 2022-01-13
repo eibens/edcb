@@ -4,6 +4,8 @@ export type CoverageOptions = {
   ignore: string;
   tests: string;
   unstable: boolean;
+  config?: string;
+  importMap?: string;
 };
 
 export async function coverage(options: CoverageOptions): Promise<void> {
@@ -11,6 +13,10 @@ export async function coverage(options: CoverageOptions): Promise<void> {
 
   // Test
   const ignore = options.ignore ? ["--ignore=" + options.ignore] : [];
+  const config = options.config ? ["--config=" + options.config] : [];
+  const importMap = options.importMap
+    ? ["--import-map=" + options.importMap]
+    : [];
   const testResult = await options.exec({
     cmd: [
       "deno",
@@ -19,6 +25,8 @@ export async function coverage(options: CoverageOptions): Promise<void> {
       "--doc",
       ...unstable,
       ...ignore,
+      ...config,
+      ...importMap,
       "--coverage=" + options.dir,
       ...(options.tests ? [options.tests] : []),
     ],

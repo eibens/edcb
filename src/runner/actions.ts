@@ -22,6 +22,8 @@ export class Actions {
     codecov?: string;
     webRoot: string;
     unstable: boolean;
+    config?: string;
+    importMap?: string;
     bundles: {
       source: string;
       target: string;
@@ -43,9 +45,12 @@ export class Actions {
   bundle(options: {
     source: string;
     target: string;
-    tsconfig?: string;
+    noCheck?: boolean;
+    config?: string;
+    importMap?: string;
   }) {
     return bundle({
+      noCheck: false,
       ...options,
       lstat: Deno.lstat,
       mkdir: this.mkdir.bind(this),
@@ -72,6 +77,8 @@ export class Actions {
     tests: string;
     ignore: string;
     unstable: boolean;
+    config?: string;
+    importMap?: string;
   }) {
     return coverage({
       ...options,
@@ -94,6 +101,7 @@ export class Actions {
   fmt(options: {
     check: boolean;
     ignore: string;
+    config?: string;
   }) {
     return fmt({
       ...options,
@@ -114,6 +122,7 @@ export class Actions {
 
   lint(options: {
     ignore: string;
+    config?: string;
   }) {
     return lint({
       ...options,
@@ -147,10 +156,13 @@ export class Actions {
     root: string;
     reload: boolean;
     webRoot: string;
+    config?: string;
+    importMap?: string;
     bundles: {
       source: string;
       target: string;
-      tsconfig?: string;
+      config?: string;
+      importMap?: string;
     }[];
   }) {
     return serve({

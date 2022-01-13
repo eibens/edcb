@@ -3,7 +3,8 @@ import { join } from "../../deps/path.ts";
 export type BundleOptions = {
   source: string;
   target: string;
-  tsconfig?: string;
+  config?: string;
+  importMap?: string;
 };
 
 export type BuildOptions = {
@@ -16,13 +17,17 @@ export type BuildOptions = {
   webRoot: string;
   bundles: BundleOptions[];
   unstable: boolean;
+  config?: string;
+  importMap?: string;
   bundle: (options: BundleOptions) => Promise<void>;
   fmt: (options: {
     ignore: string;
     check: boolean;
+    config?: string;
   }) => Promise<void>;
   lint: (options: {
     ignore: string;
+    config?: string;
   }) => Promise<void>;
   makeTempDir: () => Promise<string>;
   coverage: (options: {
@@ -30,6 +35,8 @@ export type BuildOptions = {
     ignore: string;
     tests: string;
     unstable: boolean;
+    config?: string;
+    importMap?: string;
   }) => Promise<void>;
   lcov: (options: {
     dir: string;
@@ -47,10 +54,12 @@ export async function build(options: BuildOptions) {
   await options.fmt({
     ignore: options.ignore,
     check: options.check,
+    config: options.config,
   });
 
   await options.lint({
     ignore: options.ignore,
+    config: options.config,
   });
 
   const temp = options.temp || await options.makeTempDir();
@@ -61,14 +70,17 @@ export async function build(options: BuildOptions) {
     ignore: options.ignore,
     tests: options.tests,
     unstable: options.unstable,
+    config: options.config,
+    importMap: options.importMap,
   });
 
   if (!options.check) {
     for await (const bundle of options.bundles) {
       await options.bundle({
-        tsconfig: bundle.tsconfig,
         source: bundle.source,
         target: join(options.webRoot, bundle.target),
+        config: options.config,
+        importMap: options.importMap,
       });
     }
   }

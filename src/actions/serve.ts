@@ -4,7 +4,8 @@ import { createBundler } from "../utils/bundler.ts";
 export type BundleOptions = {
   source: string;
   target: string;
-  tsconfig?: string;
+  config?: string;
+  importMap?: string;
 };
 
 export type ServeOptions = {
@@ -14,6 +15,8 @@ export type ServeOptions = {
   root: string;
   reload: boolean;
   webRoot: string;
+  config?: string;
+  importMap?: string;
   bundles: BundleOptions[];
   bundle: (options: BundleOptions) => Promise<void>;
   watch: (options: {
@@ -34,7 +37,11 @@ export type ServeOptions = {
 
 export async function serve(options: ServeOptions): Promise<void> {
   const broadcast = createBroadcast();
-  const bundler = createBundler(options);
+  const bundler = createBundler({
+    // NOTE: Speed up live-bundling by not checking types.
+    noCheck: true,
+    ...options,
+  });
 
   const watcher = options.watch({
     root: options.root,
