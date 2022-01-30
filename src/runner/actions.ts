@@ -94,7 +94,7 @@ export class Actions {
     });
   }
 
-  fetch(input: string | URL, init?: RequestInit) {
+  fetch(input: string, init?: RequestInit) {
     return globalThis.fetch(input, init);
   }
 

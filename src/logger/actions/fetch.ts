@@ -1,7 +1,7 @@
 import { withRunner } from "../middleware/with_runner.ts";
 import * as fmt from "../fmt.ts";
 
-type FetchAction = (url: string | URL, init?: RequestInit) => Promise<Response>;
+type FetchAction = (url: string, init?: RequestInit) => Promise<Response>;
 
 export function withFetchLogger(log: (x: string) => void) {
   return withRunner<FetchAction>({
